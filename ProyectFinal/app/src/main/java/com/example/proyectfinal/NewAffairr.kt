@@ -1,15 +1,11 @@
 package com.example.proyectfinal
 
-<<<<<<< HEAD
 import android.app.DatePickerDialog
 import android.app.LocaleConfig
-=======
->>>>>>> 5c9fd017fe8326a5552d5649c8d7d214d9228813
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-<<<<<<< HEAD
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -87,62 +83,38 @@ import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.ui.text.Placeholder
-
-=======
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.tooling.preview.Preview
->>>>>>> 5c9fd017fe8326a5552d5649c8d7d214d9228813
 
 class NewAffairr : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-<<<<<<< HEAD
             vista()
-=======
-
->>>>>>> 5c9fd017fe8326a5552d5649c8d7d214d9228813
         }
     }
 }
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @Composable
-<<<<<<< HEAD
 fun design(){
-=======
-fun desing(){
->>>>>>> 5c9fd017fe8326a5552d5649c8d7d214d9228813
     Box(modifier = Modifier.fillMaxSize()){
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
-<<<<<<< HEAD
                 .background(colorResource(id = R.color.Secundario)),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
             topBar()
             body()
             footer()
-=======
-                .background(colorResource(id = R.color.Secundario))
-        ){
-            TopBar()
-            Body()
-            Footer()
->>>>>>> 5c9fd017fe8326a5552d5649c8d7d214d9228813
         }
     }
 }
 
 @Composable
-<<<<<<< HEAD
 fun topBar(){
     Spacer(modifier = Modifier.height(20.dp))
     Box(
@@ -416,20 +388,6 @@ fun ComboBox(items: List<String>, etiqueta: String) {
             }
         }
     }
-=======
-fun TopBar(){
-
-}
-
-@Composable
-fun Body(){
-
-}
-
-@Composable
-fun Footer(){
-
->>>>>>> 5c9fd017fe8326a5552d5649c8d7d214d9228813
 }
 
 
@@ -437,12 +395,7 @@ fun Footer(){
 // Solo llamar la funcion que contiene el diseño
 @Preview
 @Composable
-<<<<<<< HEAD
 fun vista(){
     design()
 }
-=======
-fun view(){
-    desing()
-}
->>>>>>> 5c9fd017fe8326a5552d5649c8d7d214d9228813
+

@@ -51,12 +51,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-<<<<<<< HEAD
-            //desing()
-            design()
-=======
-            desing()
->>>>>>> 5c9fd017fe8326a5552d5649c8d7d214d9228813
+            view()
         }
     }
 }
@@ -76,7 +71,6 @@ fun desing(){
         }
 
         Box(
-<<<<<<< HEAD
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = 38.dp, end = 17.dp)
@@ -87,15 +81,6 @@ fun desing(){
                         colorResource(id = R.color.Terciario),
                         shape = RoundedCornerShape(25.dp)
                     )
-=======
-            modifier = Modifier.fillMaxSize()
-            .padding(bottom = 38.dp, end = 17.dp)
-        ){
-            IconButton(onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .background(colorResource(id = R.color.Terciario),
-                        shape = RoundedCornerShape(25.dp) )
->>>>>>> 5c9fd017fe8326a5552d5649c8d7d214d9228813
                     .align(Alignment.BottomEnd)
             ) {
                 Icon(painter = painterResource(id = R.drawable.more),
@@ -250,15 +235,10 @@ fun Body(){
             //Notas o tareas a mostrar
             Box(
                 modifier = Modifier
-<<<<<<< HEAD
                     .background(
                         colorResource(id = R.color.Terciario),
                         shape = RoundedCornerShape(15.dp)
                     )
-=======
-                    .background(colorResource(id = R.color.Terciario),
-                        shape = RoundedCornerShape(15.dp))
->>>>>>> 5c9fd017fe8326a5552d5649c8d7d214d9228813
                     .fillMaxHeight(.18f)
                     .fillMaxWidth(.85f)
             ){
