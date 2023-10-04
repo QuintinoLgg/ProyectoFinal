@@ -1,14 +1,13 @@
-package com.example.proyectfinal
+package com.example.proyectfinal.screens
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
-import android.app.LocaleConfig
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,31 +18,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -55,51 +39,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.proyectfinal.ui.theme.Purple80
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import java.util.Calendar
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerState
-import androidx.compose.material3.DisplayMode
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.ui.text.Placeholder
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.res.colorResource
-
-class NewAffairr : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            vista()
-        }
-    }
-}
+import androidx.compose.ui.draw.paint
+import androidx.navigation.NavController
+import com.example.proyectfinal.R
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @Composable
-fun design(){
+fun BodyContentAddEditNote(navController: NavController){
     Box(modifier = Modifier.fillMaxSize()){
         Column(
             modifier = Modifier
@@ -107,7 +70,7 @@ fun design(){
                 .background(colorResource(id = R.color.Secundario)),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            topBar()
+            topBar(navController)
             body()
             footer()
         }
@@ -115,7 +78,7 @@ fun design(){
 }
 
 @Composable
-fun topBar(){
+fun topBar(navController: NavController){
     Spacer(modifier = Modifier.height(20.dp))
     Box(
         modifier = Modifier
@@ -124,13 +87,26 @@ fun topBar(){
             .background(colorResource(id = R.color.Secundario)),
         contentAlignment = Alignment.Center,
     ){
-        Text(text = "Título",
-            fontSize = 30.sp,
-            color = Color.White,
-            modifier = Modifier
-                .fillMaxWidth(.70f),
-            textAlign = TextAlign.Center
+        Row(
+           verticalAlignment = Alignment.CenterVertically
         )
+        {
+            Icon(
+                Icons.Default.ArrowBack,
+                contentDescription = null,
+                modifier = Modifier
+                    .clickable {
+                        navController.popBackStack()
+                    }
+            )
+            Text(text = "Título",
+                fontSize = 30.sp,
+                color = Color.White,
+                modifier = Modifier
+                    .fillMaxWidth(.70f),
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 
@@ -390,12 +366,10 @@ fun ComboBox(items: List<String>, etiqueta: String) {
     }
 }
 
-
-//Funcion solo usada para ver la preview, sin uso mayor.
-// Solo llamar la funcion que contiene el diseño
-@Preview
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun vista(){
-    design()
+fun AddEditNoteScreen(navController: NavController){
+    Scaffold {
+        BodyContentAddEditNote(navController)
+    }
 }
-
