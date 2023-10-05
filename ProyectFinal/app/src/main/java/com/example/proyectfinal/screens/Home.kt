@@ -9,6 +9,8 @@ import androidx.annotation.ColorRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,19 +26,43 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemColors
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,17 +80,30 @@ import com.example.proyectfinal.R
 import com.example.proyectfinal.navigation.AppScreens
 import com.example.proyectfinal.ui.theme.ProyectFinalTheme
 
+
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @Composable
 fun BodyContentHome(navController: NavController){
     Box(modifier = Modifier.fillMaxSize()){
         Column(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .background(colorResource(id = R.color.Secundario))
+            modifier = Modifier,
+                //.align(Alignment.Center)
+                //.background(colorResource(id = R.color.Secundario))
+            horizontalAlignment = Alignment.CenterHorizontally
         ){
-            TopBar()
+            TopBar(navController)
+            Spacer(modifier = Modifier.height(20.dp))
             Body()
+            Spacer(modifier = Modifier.height(15.dp))
+            ExtendedFloatingActionButton(
+                onClick = { navController.navigate(route = AppScreens.AddEditNoteScreen.route) },
+                icon = { Icon(Icons.Filled.Add, contentDescription = "Nuevo asunto") },
+                text = { Text(text = "Nuevo asunto") },
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(end = 8.dp)
+            )
+            Spacer(modifier = Modifier.height(15.dp))
             Footer()
         }
         Box(
@@ -72,126 +111,46 @@ fun BodyContentHome(navController: NavController){
                 .fillMaxSize()
                 .padding(bottom = 38.dp, end = 17.dp)
         ){
+            /*
             IconButton(
                 onClick = {
                     navController.navigate(route = AppScreens.AddEditNoteScreen.route)
                 },
                 modifier = Modifier
-                    .background(
-                        colorResource(id = R.color.Terciario),
-                        shape = RoundedCornerShape(25.dp)
-                    )
                     .align(Alignment.BottomEnd)
             ) {
                 Icon(painter = painterResource(id = R.drawable.more),
                     contentDescription = "Nuevo asunto")
             }
+             */
+
         }
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(){
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.30f)
-
-    ){
-        //Variables
-        var LookFor by remember{ mutableStateOf("") }
-
-        Column(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxWidth()
-                .padding(bottom = 4.dp)
-        ){
-            //Fila del menu y el texto AGENDA
+fun TopBar(navController: NavController){
+    TopAppBar(
+        navigationIcon = {
+            IconButton(
+                onClick = { /*TODO*/ }
+            ) {
+                Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menú", modifier = Modifier.size(40.dp))
+            }
+        },
+        title = {
             Row(
-                modifier = Modifier.padding(top = 8.dp, start = 15.dp)
-            ){
-                IconButton(
-                    onClick = { /*TODO*/ },
-                    Modifier
-                        .size(45.dp)
-                        .paint(painterResource(id = R.drawable.menu))
-                )
-                {
-                }
-
-                Text(
-                    text = "AGENDA",
-                    fontSize = 34.sp,
-                    color = Color.White,
-                    modifier = Modifier
-                        .padding(start = 80.dp)
-                )
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(text = "Agenda")
             }
-
-
-
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .fillMaxHeight(.3f)
-                    .padding(start = 45.dp, top = 20.dp)
-            ){
-                Row(
-                    modifier = Modifier
-                        .padding(start = 45.dp)
-                        .background(Color.White)
-                ){
-                    IconButton(
-                        onClick = { /*TODO*/ },
-                        Modifier
-                            .paint(painterResource(id = R.drawable.lookfor))
-                            .fillMaxHeight()
-                            .fillMaxWidth(.1f)
-
-                    )
-                    {
-
-                    }
-                    BasicTextField(
-                        value = LookFor,
-                        onValueChange = {
-                            LookFor = it
-                        },
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .fillMaxWidth(1f)
-                            .padding(start = 6.dp, top = 2.dp)
-                    ) {
-                        //CONDICION LookFor: si esta vacia mostrar el palceholder sino cambiar por lo que escriba el ususario
-                        if (LookFor.isEmpty()) {
-                            Text(
-                                text = "Buscar",
-                                fontSize = 18.sp,
-                                color = Color.Gray,
-                                modifier = Modifier
-                                    .padding(start = 6.dp)
-                                    .fillMaxSize()
-                            )
-                        }else{
-                            Text(
-                                text = LookFor,
-                                fontSize = 18.sp,
-                                color = Color.Black,
-                                modifier = Modifier
-                                    .padding(start = 6.dp)
-                                    .fillMaxSize()
-                            )
-                        }
-                    }
-                }
-            }
-
-        }
-
-
-    }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+        )
+    )
 }
 
 //Cuerpo del diseño
@@ -201,102 +160,119 @@ fun Body(){
     var Name by remember{ mutableStateOf("") }
     var Affair by remember{ mutableStateOf("") }
     var dateElement by remember{ mutableStateOf("") }
-    var showMenu by  remember{ mutableStateOf(false) }
+    var search by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(.9f)
-            .padding(start = 50.dp)
-
+            .fillMaxWidth(0.9f)
+            .fillMaxHeight(0.8f)
+            .padding(start = 20.dp, top = 0.dp, end = 20.dp, bottom = 20.dp)
     ){
-        Column {
-            //Fila para los destacados con su linea vertical
+        Column(
+            modifier = Modifier
+                //.align(Alignment.Center)
+                .fillMaxWidth(1f)
+                .padding(4.dp)
+        ){
+            // Botón de búsqueda
+            OutlinedTextField(
+                value = search,
+                onValueChange = {search = it},
+                label = { Text(text = "Buscar") },
+                placeholder = { Text(text = "Buscar") },
+                leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = "Buscar") }
+            )
+            Spacer(modifier = Modifier.height(25.dp))
+
+            // LISTADO DE DESTACADOS
             Row {
-                Text(
-                    text = "Destacados",
-                    color = Color.White,
-                    fontSize = 17.sp
-                )
-                VerticalLine()
+                Icon(imageVector = Icons.Filled.Star, contentDescription = "Destacados")
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = "Destacados", style = MaterialTheme.typography.bodyLarge)
             }
+            Spacer(modifier = Modifier.height(4.dp))
+            Divider()
+            Spacer(modifier = Modifier.height(4.dp))
+            TarjetaDestacada(titulo = "Destacada 1", asunto = "Arriba el América", fecha = "03/10/2023")
+            Spacer(modifier = Modifier.height(25.dp))
 
-            Spacer(modifier = Modifier.height(30.dp))
-
-            //Fila para los elementos con su linea vertical
+            // LISTADO DE TARJETAS NORMALES
             Row {
-                Text(
-                    text = "Elementos",
-                    color = Color.White,
-                    fontSize = 17.sp
-                )
-                VerticalLine()
+                Icon(imageVector = Icons.Filled.Info, contentDescription = "Notas / Tareas")
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = "Notas / Tareas", style = MaterialTheme.typography.bodyLarge)
             }
+            Spacer(modifier = Modifier.height(4.dp))
+            Divider()
+            Spacer(modifier = Modifier.height(4.dp))
+            TarjetaNormal(titulo = "Tarjeta Normal 1", asunto = "Puros cadetes de linares", fecha = "01/01/2024")
+            TarjetaNormal(titulo = "Tarjeta Normal 2", asunto = "Puros cadetes de linares", fecha = "01/01/2024")
+        }
+    }
+}
 
-            Spacer(modifier = Modifier.height(30.dp))
 
-            //Notas o tareas a mostrar
-            Box(
-                modifier = Modifier
-                    .background(
-                        colorResource(id = R.color.Terciario),
-                        shape = RoundedCornerShape(15.dp)
-                    )
-                    .fillMaxHeight(.18f)
-                    .fillMaxWidth(.85f)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Footer(){
+    //Variables
+    var Date by remember{ mutableStateOf("") }
+
+    TopAppBar(
+        navigationIcon = {
+            Spacer(modifier = Modifier.width(10.dp))
+            IconButton(
+                onClick = { /*TODO*/ }
+            ) {
+                Icon(imageVector = Icons.Filled.DateRange, contentDescription = "Fecha", modifier = Modifier.size(40.dp))
+            }
+        },
+        title = {
+            Row(
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = "Fecha")
+                Spacer(modifier = Modifier.width(200.dp))
+                IconButton(
+                    onClick = { /*TODO*/ }
+                ) {
+                    Icon(imageVector = Icons.Filled.KeyboardArrowUp, contentDescription = "Despliegue", modifier = Modifier.size(40.dp))
+                }
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+        )
+    )
+}
+
+@Composable
+fun TarjetaDestacada(titulo: String, asunto: String, fecha: String){
+    var showMenu by  remember{ mutableStateOf(false) }
+    ListItem(
+        headlineContent = {
+            Row (
+                modifier = Modifier.fillMaxWidth()
             ){
-                Row {
-                    //Nombre, asunto y fecha de la nota o tarea
-                    Column {
-                        Text(
-                            text = "Nombre",
-                            color = Color.Black,
-                            fontSize = 19.sp,
-                            modifier = Modifier
-                                .fillMaxWidth(.8f)
-                                .padding(start = 12.dp)
-                        )
-                        Row {
-                            Image(painter = painterResource(id = R.drawable.information),
-                                contentDescription = "Informativo",
-                                modifier = Modifier.padding(start = 12.dp))
-                            Text(
-                                text = "Asunto",
-                                color = Color.Black,
-                                fontSize = 16.sp,
-                                modifier = Modifier
-                                    .padding(start = 12.dp)
-                                    .fillMaxWidth(.8f)
-                            )
-                        }
-                        Row {
-                            Image(painter = painterResource(id = R.drawable.informativedate),
-                                contentDescription = "Informativo fecha",
-                                modifier = Modifier.padding(start = 12.dp))
-                            Text(
-                                text = "Fecha",
-                                color = Color.Black,
-                                fontSize = 16.sp,
-                                modifier = Modifier
-                                    .padding(start = 12.dp)
-                                    .fillMaxWidth(.8f)
-                            )
-                        }
-                    }
-
+                Column {
+                    Text(text = titulo)
+                    Text(text = asunto)
+                    Text(text = fecha)
+                }
+                Column (
+                    horizontalAlignment = Alignment.End
+                ){
                     IconButton(onClick = {showMenu = !showMenu},
-                        modifier = Modifier.size(55.dp)
+                        modifier = Modifier.size(55.dp),
                     ) {
                         Icon(painter = painterResource(id = R.drawable.points),
                             contentDescription = "Menu de notas y tareas",
                             modifier = Modifier.padding(top = 18.dp))
                     }
-
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .padding(start = 40.dp)
-                    ){
+                    Box {
                         DropdownMenu(
                             expanded = showMenu,
                             onDismissRequest = { showMenu = false },
@@ -327,45 +303,86 @@ fun Body(){
                         }
                     }
                 }
+
             }
-        }
-    }
+        },
+        leadingContent = {
+            Icon(Icons.Filled.Star, contentDescription = "Descripción")
+        },
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            headlineColor = MaterialTheme.colorScheme.onTertiaryContainer
+        )
+    )
+    Spacer(modifier = Modifier.height(4.dp))
 }
 
-
 @Composable
-fun Footer(){
-    //Variables
-    var Date by remember{ mutableStateOf("") }
-
-    Box (
-        modifier = Modifier
-            .background(colorResource(id = R.color.Primario))
-            .border(1.dp, Color.Black)
-            .fillMaxSize()
-    ){
-        TextButton(onClick = { /*TODO*/ },
-            modifier = Modifier.fillMaxSize(.96f)
-        ) {
+fun TarjetaNormal(titulo: String, asunto: String, fecha: String){
+    var showMenu by  remember{ mutableStateOf(false) }
+    ListItem(
+        headlineContent = {
             Row (
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxWidth()
             ){
-                Image(painter = painterResource(id = R.drawable.calendar),
-                    contentDescription = "Fecha")
+                Column {
+                    Text(text = titulo)
+                    Text(text = asunto)
+                    Text(text = fecha)
+                }
+                Column (
+                    horizontalAlignment = Alignment.End
+                ){
+                    IconButton(onClick = {showMenu = !showMenu},
+                        modifier = Modifier.size(55.dp),
+                    ) {
+                        Icon(painter = painterResource(id = R.drawable.points),
+                            contentDescription = "Menu de notas y tareas",
+                            modifier = Modifier.padding(top = 18.dp))
+                    }
+                    Box {
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false },
+                            modifier = Modifier
+                                .width(150.dp)
+                                .border(1.dp, Color.Black)
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(text = "Completado") },
+                                onClick = { /*TODO*/ },
+                                modifier = Modifier.border(1.dp, Color.Black)
+                            )
+                            DropdownMenuItem(
+                                text = { Text(text = "Destacar") },
+                                onClick = { /*TODO*/ },
+                                modifier = Modifier.border(1.dp, Color.Black)
+                            )
+                            DropdownMenuItem(
+                                text = { Text(text = "Editar") },
+                                onClick = { /*TODO*/ },
+                                modifier = Modifier.border(1.dp, Color.Black)
+                            )
+                            DropdownMenuItem(
+                                text = { Text(text = "Eliminar") },
+                                onClick = { /*TODO*/ },
+                                modifier = Modifier.border(1.dp, Color.Black)
+                            )
+                        }
+                    }
+                }
 
-                Text(text = "Fecha",
-                    fontSize = 30.sp,
-                    color = Color.White,
-                    modifier = Modifier.fillMaxWidth(.70f)
-                )
-
-
-                Image(painter = painterResource(id = R.drawable.fechadesgloce),
-                    contentDescription = "Fecha")
             }
-        }
-    }
+        },
+        leadingContent = {
+            Icon(Icons.Filled.Info, contentDescription = "Descripción")
+        },
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            headlineColor = MaterialTheme.colorScheme.onTertiaryContainer
+        )
+    )
+    Spacer(modifier = Modifier.height(4.dp))
 }
 
 

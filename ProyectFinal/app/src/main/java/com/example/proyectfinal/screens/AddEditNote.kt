@@ -8,8 +8,10 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -48,15 +50,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.Calendar
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavController
 import com.example.proyectfinal.R
 
@@ -65,60 +77,44 @@ import com.example.proyectfinal.R
 fun BodyContentAddEditNote(navController: NavController){
     Box(modifier = Modifier.fillMaxSize()){
         Column(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .background(colorResource(id = R.color.Secundario)),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
             topBar(navController)
-            body()
-            footer()
+            Spacer(modifier = Modifier.height(50.dp))
+            body(navController)
         }
     }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun topBar(navController: NavController){
-    Spacer(modifier = Modifier.height(20.dp))
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.10f)
-            .background(colorResource(id = R.color.Secundario)),
-        contentAlignment = Alignment.Center,
-    ){
-        Row(
-           verticalAlignment = Alignment.CenterVertically
+    TopAppBar(
+        navigationIcon = {
+            IconButton(
+                onClick = { navController.popBackStack() }
+            ) {
+                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Regresar", modifier = Modifier.size(ButtonDefaults.IconSize))
+            }
+        },
+        title = { Text(text = "Título") },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
         )
-        {
-            Icon(
-                Icons.Default.ArrowBack,
-                contentDescription = null,
-                modifier = Modifier
-                    .clickable {
-                        navController.popBackStack()
-                    }
-            )
-            Text(text = "Título",
-                fontSize = 30.sp,
-                color = Color.White,
-                modifier = Modifier
-                    .fillMaxWidth(.70f),
-                textAlign = TextAlign.Center
-            )
-        }
-    }
+    )
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun body(){
+fun body(navController: NavController){
     Box(
         modifier = Modifier
             .fillMaxWidth(0.8f)
             .fillMaxHeight(.9f)
             .padding(start = 20.dp, top = 0.dp, end = 20.dp, bottom = 20.dp)
-            .background(colorResource(id = R.color.Secundario))
     ){
         var title by remember { mutableStateOf("")}
         var description by remember { mutableStateOf("")}
@@ -127,8 +123,7 @@ fun body(){
             modifier = Modifier
                 //.align(Alignment.Center)
                 .fillMaxWidth(1f)
-                .padding(4.dp)
-                .background(colorResource(id = R.color.Secundario)),
+                .padding(4.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // CAJA DE TEXTO DE TITULO
@@ -136,12 +131,7 @@ fun body(){
                 value = title,
                 onValueChange = { title = it },
                 label = { Text("Título") },
-                placeholder = { Text("Añadir título") },
-                colors = TextFieldDefaults.textFieldColors(
-                    containerColor = colorResource(id = R.color.Terciario),
-                    focusedLabelColor = colorResource(id = R.color.Primario),
-                    focusedIndicatorColor = colorResource(id = R.color.Primario)
-                )
+                placeholder = { Text("Añadir título") }
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -157,10 +147,6 @@ fun body(){
             // BOTONES DE MULTIMEDIA
             Column (
                 modifier = Modifier
-                    .background(
-                        colorResource(id = R.color.Terciario),
-                        shape = RoundedCornerShape(10.dp)
-                    )
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -172,10 +158,7 @@ fun body(){
                 Row {
                     // BOTON DE GALERIA
                     Button(
-                        onClick = { /*TODO*/ },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = colorResource(id = R.color.Primario)
-                        )
+                        onClick = { /*TODO*/ }
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.galery),
@@ -186,10 +169,7 @@ fun body(){
                     Spacer(modifier = Modifier.width(10.dp))
                     // BOTON DE GRABADORA
                     Button(
-                        onClick = { /*TODO*/ },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = colorResource(id = R.color.Primario)
-                        )
+                        onClick = { /*TODO*/ }
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.microphone),
@@ -200,10 +180,7 @@ fun body(){
                     Spacer(modifier = Modifier.width(10.dp))
                     // BOTON DE OPCIONES
                     Button(
-                        onClick = { /*TODO*/ },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = colorResource(id = R.color.Primario)
-                        )
+                        onClick = { /*TODO*/ }
                     ) {
                         Icon(
                             Icons.Default.MoreVert,
@@ -220,12 +197,7 @@ fun body(){
                 value = description,
                 onValueChange = { description = it },
                 label = { Text("Descripción") },
-                placeholder = { Text("Añadir Descripción") },
-                colors = TextFieldDefaults.textFieldColors(
-                    containerColor = colorResource(id = R.color.Terciario),
-                    focusedLabelColor = colorResource(id = R.color.Primario),
-                    focusedIndicatorColor = colorResource(id = R.color.Primario)
-                )
+                placeholder = { Text("Añadir Descripción") }
             )
             Spacer(modifier = Modifier.height(120.dp))
 
@@ -235,7 +207,8 @@ fun body(){
                 Button(
                     onClick = { /*TODO*/ },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = colorResource(id = R.color.Primario)
+                        containerColor = MaterialTheme.colorScheme.surfaceTint,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
                     Icon(
@@ -243,15 +216,16 @@ fun body(){
                         contentDescription = "Guardar",
                         modifier = Modifier.size(ButtonDefaults.IconSize)
                     )
-                    Spacer(modifier = Modifier.width(2.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text("Guardar")
                 }
                 Spacer(modifier = Modifier.width(10.dp))
                 // BOTON DE CANCELAR
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = { navController.popBackStack() },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = colorResource(id = R.color.Primario)
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
                     Icon(
@@ -259,7 +233,7 @@ fun body(){
                         contentDescription = "Cancelar",
                         modifier = Modifier.size(ButtonDefaults.IconSize)
                     )
-                    Spacer(modifier = Modifier.width(2.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text("Cancelar")
                 }
             }
@@ -274,7 +248,6 @@ fun footer(){
         modifier = Modifier
             .border(1.dp, Color.Black)
             .fillMaxSize()
-            .background(colorResource(id = R.color.Primario))
     ){
 
     }
@@ -315,12 +288,7 @@ fun DatePicker(){
                 contentDescription = null,
                 modifier = Modifier.clickable { nDatePickerDialog.show() }
             )
-        },
-        colors = TextFieldDefaults.textFieldColors(
-            containerColor = colorResource(id = R.color.Terciario),
-            focusedLabelColor = colorResource(id = R.color.Primario),
-            focusedIndicatorColor = colorResource(id = R.color.Primario)
-        )
+        }
     )
 }
 
@@ -341,12 +309,7 @@ fun ComboBox(items: List<String>, etiqueta: String) {
             value = selectedOptionText,
             onValueChange = {},
             label = { Text(etiqueta) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = colorResource(id = R.color.Terciario),
-                focusedLabelColor = colorResource(id = R.color.Primario),
-                focusedIndicatorColor = colorResource(id = R.color.Primario)
-            )
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
         )
         ExposedDropdownMenu(
             expanded = expanded,

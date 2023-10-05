@@ -65,6 +65,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/*
 //Funcion solo usada para ver la preview, sin uso mayor.
 // Solo llamar la funcion que contiene el diseño
 @RequiresApi(Build.VERSION_CODES.O)
@@ -72,6 +73,15 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DefaultPreview(){
     ProyectFinalTheme {
+        AppNavigation()
+    }
+}*/
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview
+@Composable
+fun DefaultPreview(){
+    ProyectFinalTheme (darkTheme = false) {
         AppNavigation()
     }
 }
