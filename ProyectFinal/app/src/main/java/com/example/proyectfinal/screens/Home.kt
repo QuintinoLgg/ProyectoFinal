@@ -3,6 +3,7 @@ package com.example.proyectfinal.screens
 import android.annotation.SuppressLint
 import android.app.Notification.Style
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.ColorRes
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -98,7 +100,7 @@ fun BodyContentHome(navController: NavController){
             ExtendedFloatingActionButton(
                 onClick = { navController.navigate(route = AppScreens.AddEditNoteScreen.route) },
                 icon = { Icon(Icons.Filled.Add, contentDescription = "Nuevo asunto") },
-                text = { Text(text = "Nuevo asunto") },
+                text = { Text(text = "Nuevo") },
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(end = 8.dp)
@@ -111,18 +113,6 @@ fun BodyContentHome(navController: NavController){
                 .fillMaxSize()
                 .padding(bottom = 38.dp, end = 17.dp)
         ){
-            /*
-            IconButton(
-                onClick = {
-                    navController.navigate(route = AppScreens.AddEditNoteScreen.route)
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-            ) {
-                Icon(painter = painterResource(id = R.drawable.more),
-                    contentDescription = "Nuevo asunto")
-            }
-             */
 
         }
     }
@@ -130,6 +120,7 @@ fun BodyContentHome(navController: NavController){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(navController: NavController){
+    var MyTitle = "Agenda"
     TopAppBar(
         navigationIcon = {
             IconButton(
@@ -142,7 +133,9 @@ fun TopBar(navController: NavController){
             Row(
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text(text = "Agenda")
+                Text(
+                    text = MyTitle,
+                    modifier = Modifier.align(Alignment.CenterVertically))
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -168,45 +161,49 @@ fun Body(){
             .fillMaxHeight(0.8f)
             .padding(start = 20.dp, top = 0.dp, end = 20.dp, bottom = 20.dp)
     ){
-        Column(
+        LazyColumn(
             modifier = Modifier
                 //.align(Alignment.Center)
                 .fillMaxWidth(1f)
                 .padding(4.dp)
         ){
             // Botón de búsqueda
-            OutlinedTextField(
-                value = search,
-                onValueChange = {search = it},
-                label = { Text(text = "Buscar") },
-                placeholder = { Text(text = "Buscar") },
-                leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = "Buscar") }
-            )
-            Spacer(modifier = Modifier.height(25.dp))
-
-            // LISTADO DE DESTACADOS
-            Row {
-                Icon(imageVector = Icons.Filled.Star, contentDescription = "Destacados")
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(text = "Destacados", style = MaterialTheme.typography.bodyLarge)
+            item {
+                OutlinedTextField(
+                    value = search,
+                    onValueChange = {search = it},
+                    label = { Text(text = "Buscar") },
+                    placeholder = { Text(text = "Buscar") },
+                    leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = "Buscar") }
+                )
+                Spacer(modifier = Modifier.height(25.dp))
             }
-            Spacer(modifier = Modifier.height(4.dp))
-            Divider()
-            Spacer(modifier = Modifier.height(4.dp))
-            TarjetaDestacada(titulo = "Destacada 1", asunto = "Arriba el América", fecha = "03/10/2023")
-            Spacer(modifier = Modifier.height(25.dp))
-
-            // LISTADO DE TARJETAS NORMALES
-            Row {
-                Icon(imageVector = Icons.Filled.Info, contentDescription = "Notas / Tareas")
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(text = "Notas / Tareas", style = MaterialTheme.typography.bodyLarge)
+            item {
+                // LISTADO DE DESTACADOS
+                Row {
+                    Icon(imageVector = Icons.Filled.Star, contentDescription = "Destacados")
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(text = "Destacados", style = MaterialTheme.typography.bodyLarge)
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Divider()
+                Spacer(modifier = Modifier.height(4.dp))
+                TarjetaDestacada(titulo = "Destacada 1", asunto = "Arriba el América", fecha = "03/10/2023")
+                Spacer(modifier = Modifier.height(25.dp))
             }
-            Spacer(modifier = Modifier.height(4.dp))
-            Divider()
-            Spacer(modifier = Modifier.height(4.dp))
-            TarjetaNormal(titulo = "Tarjeta Normal 1", asunto = "Puros cadetes de linares", fecha = "01/01/2024")
-            TarjetaNormal(titulo = "Tarjeta Normal 2", asunto = "Puros cadetes de linares", fecha = "01/01/2024")
+            item {
+                // LISTADO DE TARJETAS NORMALES
+                Row {
+                    Icon(imageVector = Icons.Filled.Info, contentDescription = "Notas / Tareas")
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(text = "Notas / Tareas", style = MaterialTheme.typography.bodyLarge)
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Divider()
+                Spacer(modifier = Modifier.height(4.dp))
+                TarjetaNormal(titulo = "Tarjeta Normal 1", asunto = "Puros cadetes de linares", fecha = "01/01/2024")
+                TarjetaNormal(titulo = "Tarjeta Normal 2", asunto = "Puros cadetes de linares", fecha = "01/01/2024")
+            }
         }
     }
 }
@@ -216,7 +213,9 @@ fun Body(){
 @Composable
 fun Footer(){
     //Variables
-    var Date by remember{ mutableStateOf("") }
+    var showMenuHamburguer by  remember{ mutableStateOf(false) }
+
+
 
     TopAppBar(
         navigationIcon = {
@@ -235,9 +234,41 @@ fun Footer(){
                 Text(text = "Fecha")
                 Spacer(modifier = Modifier.width(200.dp))
                 IconButton(
-                    onClick = { /*TODO*/ }
+                    onClick = { showMenuHamburguer = !showMenuHamburguer}
                 ) {
                     Icon(imageVector = Icons.Filled.KeyboardArrowUp, contentDescription = "Despliegue", modifier = Modifier.size(40.dp))
+                }
+            }
+            Box(modifier = Modifier.fillMaxSize()) {
+                DropdownMenu(
+                    expanded = showMenuHamburguer,
+                    onDismissRequest = { showMenuHamburguer = false },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(.2f)
+                        .border(1.dp, Color.Black)
+                        .align(Alignment.BottomEnd)
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(text = "Dia") },
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier.border(1.dp, Color.Black)
+                    )
+                    DropdownMenuItem(
+                        text = { Text(text = "Semana") },
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier.border(1.dp, Color.Black)
+                    )
+                    DropdownMenuItem(
+                        text = { Text(text = "Mes") },
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier.border(1.dp, Color.Black)
+                    )
+                    DropdownMenuItem(
+                        text = { Text(text = "Todos") },
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier.border(1.dp, Color.Black)
+                    )
                 }
             }
         },
@@ -386,16 +417,7 @@ fun TarjetaNormal(titulo: String, asunto: String, fecha: String){
 }
 
 
-//Para crear las lineas verticales
-@Composable
-fun VerticalLine() {
-    Spacer(
-        modifier = Modifier
-            .height(2.dp)
-            .width(200.dp)
-            .background(Color.White)
-    )
-}
+
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

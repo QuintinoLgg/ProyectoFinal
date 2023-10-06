@@ -98,7 +98,9 @@ fun topBar(navController: NavController){
                 Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Regresar", modifier = Modifier.size(ButtonDefaults.IconSize))
             }
         },
-        title = { Text(text = "Título") },
+        title = { Text(
+            text = "Datos"
+        ) },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
             titleContentColor = MaterialTheme.colorScheme.onPrimary,
