@@ -81,6 +81,9 @@ import androidx.navigation.NavController
 import com.example.proyectfinal.R
 import com.example.proyectfinal.navigation.AppScreens
 import com.example.proyectfinal.ui.theme.ProyectFinalTheme
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.remember
+import androidx.compose.material.DropdownMenuItem
 
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
@@ -213,7 +216,10 @@ fun Body(){
 @Composable
 fun Footer(){
     //Variables
-    var showMenuHamburguer by  remember{ mutableStateOf(false) }
+    var showMenuDate by  remember{ mutableStateOf(false) }
+    val showDate = remember {
+        mutableStateOf("Todos")
+    }
 
 
 
@@ -227,22 +233,26 @@ fun Footer(){
             }
         },
         title = {
+
             Row(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Spacer(modifier = Modifier.width(10.dp))
-                Text(text = "Fecha")
+                Text(text = showDate.value,
+                    modifier = Modifier.padding(top = 15.dp))
                 Spacer(modifier = Modifier.width(200.dp))
                 IconButton(
-                    onClick = { showMenuHamburguer = !showMenuHamburguer}
+                    onClick = { showMenuDate = !showMenuDate}
                 ) {
-                    Icon(imageVector = Icons.Filled.KeyboardArrowUp, contentDescription = "Despliegue", modifier = Modifier.size(40.dp))
+                    Icon(imageVector = Icons.Filled.KeyboardArrowUp,
+                        contentDescription = "Despliegue",
+                        modifier = Modifier.size(40.dp).padding(top = 5.dp))
                 }
             }
             Box(modifier = Modifier.fillMaxSize()) {
                 DropdownMenu(
-                    expanded = showMenuHamburguer,
-                    onDismissRequest = { showMenuHamburguer = false },
+                    expanded = showMenuDate,
+                    onDismissRequest = { showMenuDate = false },
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight(.2f)
@@ -250,25 +260,45 @@ fun Footer(){
                         .align(Alignment.BottomEnd)
                 ) {
                     DropdownMenuItem(
-                        text = { Text(text = "Dia") },
-                        onClick = { /*TODO*/ },
-                        modifier = Modifier.border(1.dp, Color.Black)
-                    )
+                        onClick = {
+                            showDate.value = "Hoy"
+                            showMenuDate = !showMenuDate
+                    }) {
+                        Icon(imageVector = Icons.Filled.DateRange,
+                            contentDescription = "Fecha")
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(text = "Hoy")
+                    }
                     DropdownMenuItem(
-                        text = { Text(text = "Semana") },
-                        onClick = { /*TODO*/ },
-                        modifier = Modifier.border(1.dp, Color.Black)
-                    )
+                            onClick = {
+                                showDate.value = "Semana"
+                                showMenuDate = !showMenuDate
+                            }) {
+                        Icon(imageVector = Icons.Filled.DateRange,
+                            contentDescription = "Fecha")
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(text = "Semana")
+                    }
                     DropdownMenuItem(
-                        text = { Text(text = "Mes") },
-                        onClick = { /*TODO*/ },
-                        modifier = Modifier.border(1.dp, Color.Black)
-                    )
+                        onClick = {
+                            showDate.value = "Mes"
+                            showMenuDate = !showMenuDate
+                        }){
+                        Icon(imageVector = Icons.Filled.DateRange,
+                            contentDescription = "Fecha")
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(text = "Mes")
+                    }
                     DropdownMenuItem(
-                        text = { Text(text = "Todos") },
-                        onClick = { /*TODO*/ },
-                        modifier = Modifier.border(1.dp, Color.Black)
-                    )
+                        onClick = {
+                            showDate.value = "Todos"
+                            showMenuDate = !showMenuDate
+                        }){
+                        Icon(imageVector = Icons.Filled.DateRange,
+                            contentDescription = "Fecha")
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(text = "Todos")
+                    }
                 }
             }
         },
@@ -309,27 +339,22 @@ fun TarjetaDestacada(titulo: String, asunto: String, fecha: String){
                             onDismissRequest = { showMenu = false },
                             modifier = Modifier
                                 .width(150.dp)
-                                .border(1.dp, Color.Black)
                         ) {
                             DropdownMenuItem(
                                 text = { Text(text = "Completado") },
-                                onClick = { /*TODO*/ },
-                                modifier = Modifier.border(1.dp, Color.Black)
+                                onClick = { /*TODO*/ }
                             )
                             DropdownMenuItem(
                                 text = { Text(text = "Destacar") },
-                                onClick = { /*TODO*/ },
-                                modifier = Modifier.border(1.dp, Color.Black)
+                                onClick = { /*TODO*/ }
                             )
                             DropdownMenuItem(
                                 text = { Text(text = "Editar") },
-                                onClick = { /*TODO*/ },
-                                modifier = Modifier.border(1.dp, Color.Black)
+                                onClick = { /*TODO*/ }
                             )
                             DropdownMenuItem(
                                 text = { Text(text = "Eliminar") },
-                                onClick = { /*TODO*/ },
-                                modifier = Modifier.border(1.dp, Color.Black)
+                                onClick = { /*TODO*/ }
                             )
                         }
                     }
@@ -377,27 +402,22 @@ fun TarjetaNormal(titulo: String, asunto: String, fecha: String){
                             onDismissRequest = { showMenu = false },
                             modifier = Modifier
                                 .width(150.dp)
-                                .border(1.dp, Color.Black)
                         ) {
                             DropdownMenuItem(
                                 text = { Text(text = "Completado") },
-                                onClick = { /*TODO*/ },
-                                modifier = Modifier.border(1.dp, Color.Black)
+                                onClick = { /*TODO*/ }
                             )
                             DropdownMenuItem(
                                 text = { Text(text = "Destacar") },
-                                onClick = { /*TODO*/ },
-                                modifier = Modifier.border(1.dp, Color.Black)
+                                onClick = { /*TODO*/ }
                             )
                             DropdownMenuItem(
                                 text = { Text(text = "Editar") },
-                                onClick = { /*TODO*/ },
-                                modifier = Modifier.border(1.dp, Color.Black)
+                                onClick = { /*TODO*/ }
                             )
                             DropdownMenuItem(
                                 text = { Text(text = "Eliminar") },
-                                onClick = { /*TODO*/ },
-                                modifier = Modifier.border(1.dp, Color.Black)
+                                onClick = { /*TODO*/ }
                             )
                         }
                     }
