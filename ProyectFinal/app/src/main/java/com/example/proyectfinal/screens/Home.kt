@@ -82,8 +82,12 @@ import com.example.proyectfinal.R
 import com.example.proyectfinal.navigation.AppScreens
 import com.example.proyectfinal.ui.theme.ProyectFinalTheme
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.remember
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Handshake
 import androidx.compose.material.icons.filled.Note
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -200,7 +204,7 @@ fun Body(navController: NavController){
                 Spacer(modifier = Modifier.height(8.dp))
                 Tarjeta(titulo = "Puros Cadetes de Linares", asunto = stringResource(id = R.string.tarea), fecha = "01/01/2024")
                 Tarjeta(titulo = "Arriba Ramón Ayala", asunto = stringResource(id = R.string.tarea), fecha = "01/01/2024")
-                Tarjeta(titulo = "Y que siga la mata dando viejooo", stringResource(id = R.string.nota), fecha = "28/08/2024")
+                Tarjeta(titulo = "Y que siga la mata ", stringResource(id = R.string.nota), fecha = "28/08/2024")
                 Tarjeta(titulo = "Márquele compa nitro", asunto = stringResource(id = R.string.tarea), fecha = "13/12/2021")
             }
         }
@@ -318,6 +322,8 @@ fun Footer(){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Tarjeta(titulo: String, asunto: String, fecha: String){
+    var showMenuAffair by  remember{ mutableStateOf(false) }
+
     val context = LocalContext.current
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
@@ -328,31 +334,93 @@ fun Tarjeta(titulo: String, asunto: String, fecha: String){
             .fillMaxHeight(0.2f),
         onClick = { /*TODO*/ }
     ) {
-        Column (
+        Row(modifier = Modifier.fillMaxSize()){
+            Column (
+                modifier = Modifier
+                    .padding(start = 10.dp, top = 4.dp, bottom = 8.dp)
+
+            ) {
+                Text(
+                    text = titulo,
+                    modifier = Modifier
+                        .padding(top = 6.dp),
+                    textAlign = TextAlign.Start,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+                Text(
+                    text = asunto,
+                    modifier = Modifier
+                        .padding(2.dp),
+                    textAlign = TextAlign.Start
+                )
+                Text(
+                    text = fecha,
+                    modifier = Modifier
+                        .padding(2.dp),
+                    textAlign = TextAlign.Start
+                )
+            }
+            IconButton(onClick = { showMenuAffair = !showMenuAffair }, modifier = Modifier.fillMaxSize().align(Alignment.CenterVertically)) {
+                Icon(painter = painterResource(id = R.drawable.points), contentDescription = null,
+                    modifier = Modifier.align(Alignment.CenterVertically).size(50.dp).fillMaxSize())
+            }
+        }
+    }
+    //Menu desplegable de cada asunto
+    Box(modifier = Modifier.fillMaxSize().padding(start = 120.dp)) {
+        DropdownMenu(
+            expanded = showMenuAffair,
+            onDismissRequest = { showMenuAffair = false },
             modifier = Modifier
-                .padding(start = 10.dp, top = 4.dp, bottom = 8.dp)
-                .align(Alignment.Start)
+                .fillMaxWidth(.45f)
+                .border(1.dp, Color.Black)
         ) {
-            Text(
-                text = titulo,
-                modifier = Modifier
-                    .padding(top = 6.dp),
-                textAlign = TextAlign.Start,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
-            )
-            Text(
-                text = asunto,
-                modifier = Modifier
-                    .padding(2.dp),
-                textAlign = TextAlign.Start
-            )
-            Text(
-                text = fecha,
-                modifier = Modifier
-                    .padding(2.dp),
-                textAlign = TextAlign.Start
-            )
+            DropdownMenuItem(
+                onClick = {
+                    showMenuAffair = !showMenuAffair
+                }) {
+                Icon(
+                    imageVector = Icons.Filled.Handshake,
+                    contentDescription = "Terminado"
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = stringResource(id = R.string.terminado))
+            }
+            DropdownMenuItem(
+                onClick = {
+                    showMenuAffair = !showMenuAffair
+                }) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = "Destacar"
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = stringResource(id = R.string.destacado))
+            }
+            DropdownMenuItem(
+                onClick = {
+                    showMenuAffair = !showMenuAffair
+                }) {
+                Icon(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "Editar"
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = stringResource(id = R.string.editar))
+            }
+            DropdownMenuItem(
+                onClick = {
+                    showMenuAffair = !showMenuAffair
+                }) {
+                Icon(
+                    imageVector = Icons.Filled.Delete,
+                    contentDescription = "Eliminar"
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = stringResource(id = R.string.eliminar))
+            }
+
         }
     }
     Spacer(modifier = Modifier.height(15.dp))
