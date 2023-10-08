@@ -55,7 +55,9 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -68,6 +70,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavController
 import com.example.proyectfinal.R
@@ -95,11 +98,11 @@ fun topBar(navController: NavController){
             IconButton(
                 onClick = { navController.popBackStack() }
             ) {
-                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Regresar", modifier = Modifier.size(ButtonDefaults.IconSize))
+                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Regresar", modifier = Modifier.size(30.dp))
             }
         },
         title = { Text(
-            text = "Datos"
+            text = stringResource(id = R.string.datos)
         ) },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
@@ -132,14 +135,14 @@ fun body(navController: NavController){
             TextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("Título") },
-                placeholder = { Text("Añadir título") }
+                label = { Text(stringResource(id = R.string.titulo)) },
+                placeholder = { Text(stringResource(id = R.string.agregar_titulo)) }
             )
             Spacer(modifier = Modifier.height(16.dp))
 
             // COMBOBOX PARA ESCOGER NOTA O TAREA
-            val options = listOf("Nota","Tarea")
-            ComboBox(options, "Asunto")
+            val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
+            ComboBox(options, stringResource(id = R.string.asunto))
             Spacer(modifier = Modifier.height(16.dp))
 
             // DATETIMEPICKER PARA SELECCIONAR LA FECHA DE LA NOTA
@@ -153,7 +156,7 @@ fun body(navController: NavController){
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Crea y/o selecciona archivos multimedia",
+                    text = stringResource(id = R.string.apartado_multimedia),
                     fontSize = 15.sp,
                     textAlign = TextAlign.Center
                 )
@@ -163,9 +166,9 @@ fun body(navController: NavController){
                         onClick = { /*TODO*/ }
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.galery),
+                            Icons.Filled.Image,
                             contentDescription = "Galería",
-                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                            modifier = Modifier.size(25.dp)
                         )
                     }
                     Spacer(modifier = Modifier.width(10.dp))
@@ -174,9 +177,9 @@ fun body(navController: NavController){
                         onClick = { /*TODO*/ }
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.microphone),
+                            Icons.Filled.Mic,
                             contentDescription = "Micrófono",
-                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                            modifier = Modifier.size(25.dp)
                         )
                     }
                     Spacer(modifier = Modifier.width(10.dp))
@@ -187,7 +190,7 @@ fun body(navController: NavController){
                         Icon(
                             Icons.Default.MoreVert,
                             contentDescription = "Más opciones",
-                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                            modifier = Modifier.size(25.dp)
                         )
                     }
                 }
@@ -198,8 +201,8 @@ fun body(navController: NavController){
             TextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Descripción") },
-                placeholder = { Text("Añadir Descripción") }
+                label = { Text(stringResource(id = R.string.descripcion)) },
+                placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) }
             )
             Spacer(modifier = Modifier.height(120.dp))
 
@@ -216,10 +219,10 @@ fun body(navController: NavController){
                     Icon(
                         Icons.Default.Check,
                         contentDescription = "Guardar",
-                        modifier = Modifier.size(ButtonDefaults.IconSize)
+                        modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Guardar")
+                    Text(stringResource(id = R.string.guardar))
                 }
                 Spacer(modifier = Modifier.width(10.dp))
                 // BOTON DE CANCELAR
@@ -233,10 +236,10 @@ fun body(navController: NavController){
                     Icon(
                         Icons.Default.Clear,
                         contentDescription = "Cancelar",
-                        modifier = Modifier.size(ButtonDefaults.IconSize)
+                        modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Cancelar")
+                    Text(stringResource(id = R.string.cancelar))
                 }
             }
 
@@ -282,8 +285,8 @@ fun DatePicker(){
         value = fecha,
         onValueChange = {fecha = it},
         readOnly = true,
-        label = { Text("Fecha") },
-        placeholder = { Text("Selecciona una fecha") },
+        label = { Text(stringResource(id = R.string.fecha)) },
+        placeholder = { Text(stringResource(id = R.string.selecciona_fecha)) },
         leadingIcon = {
             Icon(
                 Icons.Default.DateRange,
