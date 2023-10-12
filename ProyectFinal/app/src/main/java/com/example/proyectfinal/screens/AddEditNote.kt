@@ -2,25 +2,16 @@ package com.example.proyectfinal.screens
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.MoreVert
@@ -38,40 +29,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.Calendar
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
-import androidx.compose.ui.draw.paint
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavController
 import com.example.proyectfinal.R
 
@@ -82,181 +59,170 @@ fun BodyContentAddEditNote(navController: NavController){
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            topBar(navController)
-            Spacer(modifier = Modifier.height(50.dp))
-            body(navController)
+            desingNote(navController)
         }
     }
 }
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun topBar(navController: NavController){
-    TopAppBar(
-        navigationIcon = {
-            IconButton(
-                onClick = { navController.popBackStack() }
-            ) {
-                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Regresar", modifier = Modifier.size(30.dp))
-            }
-        },
-        title = { Text(
-            text = stringResource(id = R.string.datos)
-        ) },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-        )
-    )
-}
-
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
-@Composable
-fun body(navController: NavController){
-    Box(
-        modifier = Modifier
-            .fillMaxWidth(0.8f)
-            .fillMaxHeight(.9f)
-            .padding(start = 20.dp, top = 0.dp, end = 20.dp, bottom = 20.dp)
-    ){
-        var title by remember { mutableStateOf("")}
-        var description by remember { mutableStateOf("")}
-
-        Column(
-            modifier = Modifier
-                //.align(Alignment.Center)
-                .fillMaxWidth(1f)
-                .padding(4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // CAJA DE TEXTO DE TITULO
-            TextField(
-                value = title,
-                onValueChange = { title = it },
-                label = { Text(stringResource(id = R.string.titulo)) },
-                placeholder = { Text(stringResource(id = R.string.agregar_titulo)) }
+fun desingNote(navController: NavController){
+    Scaffold (
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navController.popBackStack() }
+                    ) {
+                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Regresar", modifier = Modifier.size(30.dp))
+                    }
+                },
+                title = { Text(
+                    text = stringResource(id = R.string.datos)
+                ) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                )
             )
-            Spacer(modifier = Modifier.height(16.dp))
+        }
+    ){
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 20.dp)
+        ){
+            var title by remember { mutableStateOf("")}
+            var description by remember { mutableStateOf("")}
 
-            // COMBOBOX PARA ESCOGER NOTA O TAREA
-            val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
-            ComboBox(options, stringResource(id = R.string.asunto))
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // DATETIMEPICKER PARA SELECCIONAR LA FECHA DE LA NOTA
-            DatePicker()
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // BOTONES DE MULTIMEDIA
-            Column (
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth(1f)
+                    .padding(4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = stringResource(id = R.string.apartado_multimedia),
-                    fontSize = 15.sp,
-                    textAlign = TextAlign.Center
+                // CAJA DE TEXTO DE TITULO
+                TextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text(stringResource(id = R.string.titulo)) },
+                    placeholder = { Text(stringResource(id = R.string.agregar_titulo)) }
                 )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // COMBOBOX PARA ESCOGER NOTA O TAREA
+                val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
+                ComboBox(options, stringResource(id = R.string.asunto))
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // DATETIMEPICKER PARA SELECCIONAR LA FECHA DE LA NOTA
+                DatePicker()
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // BOTONES DE MULTIMEDIA
+                Column (
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.apartado_multimedia),
+                        fontSize = 15.sp,
+                        textAlign = TextAlign.Center
+                    )
+                    Row {
+                        // BOTON DE GALERIA
+                        Button(
+                            onClick = { /*TODO*/ }
+                        ) {
+                            Icon(
+                                Icons.Filled.Image,
+                                contentDescription = "Galería",
+                                modifier = Modifier.size(25.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        // BOTON DE GRABADORA
+                        Button(
+                            onClick = { /*TODO*/ }
+                        ) {
+                            Icon(
+                                Icons.Filled.Mic,
+                                contentDescription = "Micrófono",
+                                modifier = Modifier.size(25.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        // BOTON DE OPCIONES
+                        Button(
+                            onClick = { /*TODO*/ }
+                        ) {
+                            Icon(
+                                Icons.Default.MoreVert,
+                                contentDescription = "Más opciones",
+                                modifier = Modifier.size(25.dp)
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // CAJA DE TEXTO PARA LA DESCRIPCI[ON
+                TextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text(stringResource(id = R.string.descripcion)) },
+                    placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) }
+                )
+                Spacer(modifier = Modifier.height(120.dp))
+
+                // BOTÓN GUARDAR Y CANCELAR
                 Row {
-                    // BOTON DE GALERIA
+                    // BOTON DE GUARDAR
                     Button(
-                        onClick = { /*TODO*/ }
+                        onClick = { /*TODO*/ },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceTint,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
                     ) {
                         Icon(
-                            Icons.Filled.Image,
-                            contentDescription = "Galería",
-                            modifier = Modifier.size(25.dp)
+                            Icons.Default.Check,
+                            contentDescription = "Guardar",
+                            modifier = Modifier.size(20.dp)
                         )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(stringResource(id = R.string.guardar))
                     }
                     Spacer(modifier = Modifier.width(10.dp))
-                    // BOTON DE GRABADORA
+                    // BOTON DE CANCELAR
                     Button(
-                        onClick = { /*TODO*/ }
+                        onClick = { navController.popBackStack() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
                     ) {
                         Icon(
-                            Icons.Filled.Mic,
-                            contentDescription = "Micrófono",
-                            modifier = Modifier.size(25.dp)
+                            Icons.Default.Clear,
+                            contentDescription = "Cancelar",
+                            modifier = Modifier.size(20.dp)
                         )
-                    }
-                    Spacer(modifier = Modifier.width(10.dp))
-                    // BOTON DE OPCIONES
-                    Button(
-                        onClick = { /*TODO*/ }
-                    ) {
-                        Icon(
-                            Icons.Default.MoreVert,
-                            contentDescription = "Más opciones",
-                            modifier = Modifier.size(25.dp)
-                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(stringResource(id = R.string.cancelar))
                     }
                 }
+
             }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // CAJA DE TEXTO PARA LA DESCRIPCI[ON
-            TextField(
-                value = description,
-                onValueChange = { description = it },
-                label = { Text(stringResource(id = R.string.descripcion)) },
-                placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) }
-            )
-            Spacer(modifier = Modifier.height(120.dp))
-
-            // BOTÓN GUARDAR Y CANCELAR
-            Row {
-                // BOTON DE GUARDAR
-                Button(
-                    onClick = { /*TODO*/ },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceTint,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                ) {
-                    Icon(
-                        Icons.Default.Check,
-                        contentDescription = "Guardar",
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(stringResource(id = R.string.guardar))
-                }
-                Spacer(modifier = Modifier.width(10.dp))
-                // BOTON DE CANCELAR
-                Button(
-                    onClick = { navController.popBackStack() },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                ) {
-                    Icon(
-                        Icons.Default.Clear,
-                        contentDescription = "Cancelar",
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(stringResource(id = R.string.cancelar))
-                }
-            }
-
         }
     }
 }
 
-@Composable
-fun footer(){
-    Box(
-        modifier = Modifier
-            .border(1.dp, Color.Black)
-            .fillMaxSize()
-    ){
 
-    }
-}
+
 
 // DATETIME PICKER PERSONALIZADO
 @OptIn(ExperimentalMaterial3Api::class)
