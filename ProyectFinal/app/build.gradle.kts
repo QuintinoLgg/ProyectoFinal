@@ -66,6 +66,7 @@ dependencies {
     implementation("com.google.ar.sceneform:filament-android:1.17.1")
     implementation("androidx.compose.ui:ui:1.0.3")
     implementation("androidx.compose.material:material:1.0.3")
+    implementation("androidx.compose.material3:material3:1.0.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -75,4 +76,5 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 }

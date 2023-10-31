@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
@@ -62,6 +63,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectfinal.ui.theme.MainViewModel
 
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
@@ -84,6 +87,10 @@ fun BodyContentHome(navController: NavController){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun desing(navController: NavController){
+
+    //Variable para el ViewModel
+    val miViewModel = viewModel<MainViewModel>()
+
     Scaffold (
         topBar = {
             var MyTitle = stringResource(id = R.string.agenda)
@@ -166,7 +173,8 @@ fun desing(navController: NavController){
                             ) {
                                 DropdownMenuItem(
                                     onClick = {
-                                        showDate.value = "Hoy"
+                                        miViewModel.date = "Hoy"
+                                        showDate.value = miViewModel.date
                                         showMenuDate = !showMenuDate
                                     }) {
                                     Icon(imageVector = Icons.Filled.DateRange,
@@ -176,7 +184,8 @@ fun desing(navController: NavController){
                                 }
                                 DropdownMenuItem(
                                     onClick = {
-                                        showDate.value = "Semana"
+                                        miViewModel.date = "Semana"
+                                        showDate.value = miViewModel.date
                                         showMenuDate = !showMenuDate
                                     }) {
                                     Icon(imageVector = Icons.Filled.DateRange,
@@ -186,7 +195,8 @@ fun desing(navController: NavController){
                                 }
                                 DropdownMenuItem(
                                     onClick = {
-                                        showDate.value = "Mes"
+                                        miViewModel.date = "Mes"
+                                        showDate.value = miViewModel.date
                                         showMenuDate = !showMenuDate
                                     }){
                                     Icon(imageVector = Icons.Filled.DateRange,
@@ -196,7 +206,8 @@ fun desing(navController: NavController){
                                 }
                                 DropdownMenuItem(
                                     onClick = {
-                                        showDate.value = "Todos"
+                                        miViewModel.date = "Todos"
+                                        showDate.value = miViewModel.date
                                         showMenuDate = !showMenuDate
                                     }){
                                     Icon(imageVector = Icons.Filled.DateRange,
@@ -221,6 +232,26 @@ fun desing(navController: NavController){
         var Affair by remember{ mutableStateOf("") }
         var dateElement by remember{ mutableStateOf("") }
         var search by remember { mutableStateOf("") }
+
+        //Listas
+        val titulos = listOf(
+            "Puros Cadetes de Linares",
+            "Arriba Ramón Ayala no se quien sea",
+            "Y que siga la mata",
+            "Márquele compa nitr no se quien seao"
+        )
+        val asuntos = listOf(
+            "Tarea",
+            "Tarea",
+            "Nota",
+            "Tarea"
+        )
+        val fechas = listOf(
+            "01/01/2024",
+            "01/01/2024",
+            "28/08/2024",
+            "13/12/2021"
+        )
 
         Box(
             modifier = Modifier
@@ -269,10 +300,10 @@ fun desing(navController: NavController){
                     Spacer(modifier = Modifier.height(4.dp))
                     Divider()
                     Spacer(modifier = Modifier.height(8.dp))
-                    Tarjeta(titulo = "Puros Cadetes de Linares", asunto = stringResource(id = R.string.tarea), fecha = "01/01/2024")
-                    Tarjeta(titulo = "Arriba Ramón Ayala no se quien sea", asunto = stringResource(id = R.string.tarea), fecha = "01/01/2024")
-                    Tarjeta(titulo = "Y que siga la mata ", stringResource(id = R.string.nota), fecha = "28/08/2024")
-                    Tarjeta(titulo = "Márquele compa nitr no se quien seao", asunto = stringResource(id = R.string.tarea), fecha = "13/12/2021")
+
+                  }
+                items(titulos.size) { index ->
+                    Tarjeta(titulo = titulos[index], asunto = asuntos[index], fecha = fechas[index])
                 }
             }
             ExtendedFloatingActionButton(
@@ -413,5 +444,7 @@ fun HomeScreen(navController: NavController){
         BodyContentHome(navController)
     }
 }
+
+
 
 

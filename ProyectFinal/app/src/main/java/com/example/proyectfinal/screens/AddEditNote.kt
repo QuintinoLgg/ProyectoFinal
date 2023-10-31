@@ -49,8 +49,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.example.proyectfinal.R
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectfinal.ui.theme.MainViewModel
+import java.time.LocalDate
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @Composable
@@ -69,6 +73,9 @@ fun BodyContentAddEditNote(navController: NavController){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun desingNote(navController: NavController){
+    //Variable de ViewModel
+    val miViewModel = viewModel<MainViewModel>()
+
     Scaffold (
         topBar = {
             TopAppBar(
@@ -119,7 +126,8 @@ fun desingNote(navController: NavController){
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // DATETIMEPICKER PARA SELECCIONAR LA FECHA DE LA NOTA
-                DatePicker()
+                DatePicker(
+                )
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // BOTONES DE MULTIMEDIA
@@ -183,7 +191,11 @@ fun desingNote(navController: NavController){
                 Row {
                     // BOTON DE GUARDAR
                     Button(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            miViewModel.tittle = title
+                            miViewModel.subject = options.toString()
+                            miViewModel.description = description
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.surfaceTint,
                             contentColor = MaterialTheme.colorScheme.onPrimary
