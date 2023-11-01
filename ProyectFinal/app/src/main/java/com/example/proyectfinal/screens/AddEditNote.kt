@@ -54,6 +54,7 @@ import androidx.navigation.NavController
 import com.example.proyectfinal.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectfinal.ui.theme.MainViewModel
+import com.example.proyectfinal.ui.theme.dimens
 import java.time.LocalDate
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
@@ -83,7 +84,7 @@ fun desingNote(navController: NavController){
                     IconButton(
                         onClick = { navController.popBackStack() }
                     ) {
-                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Regresar", modifier = Modifier.size(30.dp))
+                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Regresar", modifier = Modifier.size(MaterialTheme.dimens.medium2))
                     }
                 },
                 title = { Text(
@@ -100,7 +101,7 @@ fun desingNote(navController: NavController){
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 20.dp)
+                .padding(start = MaterialTheme.dimens.medium1, top = MaterialTheme.dimens.medium3, end = MaterialTheme.dimens.medium1, bottom = MaterialTheme.dimens.medium1)
         ){
             var title by remember { mutableStateOf("")}
             var description by remember { mutableStateOf("")}
@@ -108,7 +109,7 @@ fun desingNote(navController: NavController){
             Column(
                 modifier = Modifier
                     .fillMaxWidth(1f)
-                    .padding(4.dp),
+                    .padding(MaterialTheme.dimens.small2),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // CAJA DE TEXTO DE TITULO
@@ -118,17 +119,17 @@ fun desingNote(navController: NavController){
                     label = { Text(stringResource(id = R.string.titulo)) },
                     placeholder = { Text(stringResource(id = R.string.agregar_titulo)) }
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.dimens.medium1))
 
                 // COMBOBOX PARA ESCOGER NOTA O TAREA
                 val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
                 ComboBox(options, stringResource(id = R.string.asunto))
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.dimens.medium1))
 
                 // DATETIMEPICKER PARA SELECCIONAR LA FECHA DE LA NOTA
                 DatePicker(
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.dimens.medium1))
 
                 // BOTONES DE MULTIMEDIA
                 Column (
@@ -149,10 +150,10 @@ fun desingNote(navController: NavController){
                             Icon(
                                 Icons.Filled.Image,
                                 contentDescription = "Galería",
-                                modifier = Modifier.size(25.dp)
+                                modifier = Modifier.size(MaterialTheme.dimens.medium1)
                             )
                         }
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(MaterialTheme.dimens.medium1))
                         // BOTON DE GRABADORA
                         Button(
                             onClick = { /*TODO*/ }
@@ -160,10 +161,10 @@ fun desingNote(navController: NavController){
                             Icon(
                                 Icons.Filled.Mic,
                                 contentDescription = "Micrófono",
-                                modifier = Modifier.size(25.dp)
+                                modifier = Modifier.size(MaterialTheme.dimens.medium1)
                             )
                         }
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(MaterialTheme.dimens.small3))
                         // BOTON DE OPCIONES
                         Button(
                             onClick = { /*TODO*/ }
@@ -171,12 +172,12 @@ fun desingNote(navController: NavController){
                             Icon(
                                 Icons.Default.MoreVert,
                                 contentDescription = "Más opciones",
-                                modifier = Modifier.size(25.dp)
+                                modifier = Modifier.size(MaterialTheme.dimens.medium1)
                             )
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.dimens.medium1))
 
                 // CAJA DE TEXTO PARA LA DESCRIPCI[ON
                 TextField(
@@ -185,7 +186,7 @@ fun desingNote(navController: NavController){
                     label = { Text(stringResource(id = R.string.descripcion)) },
                     placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) }
                 )
-                Spacer(modifier = Modifier.height(120.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.dimens.large))
 
                 // BOTÓN GUARDAR Y CANCELAR
                 Row {
@@ -204,12 +205,12 @@ fun desingNote(navController: NavController){
                         Icon(
                             Icons.Default.Check,
                             contentDescription = "Guardar",
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(MaterialTheme.dimens.medium1)
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(MaterialTheme.dimens.small2))
                         Text(stringResource(id = R.string.guardar))
                     }
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(MaterialTheme.dimens.small3))
                     // BOTON DE CANCELAR
                     Button(
                         onClick = { navController.popBackStack() },
@@ -221,9 +222,9 @@ fun desingNote(navController: NavController){
                         Icon(
                             Icons.Default.Clear,
                             contentDescription = "Cancelar",
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(MaterialTheme.dimens.medium1)
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(MaterialTheme.dimens.small2))
                         Text(stringResource(id = R.string.cancelar))
                     }
                 }
