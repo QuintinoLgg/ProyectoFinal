@@ -65,6 +65,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectfinal.ui.theme.MainViewModel
+import com.example.proyectfinal.ui.theme.dimens
 
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
@@ -99,7 +100,7 @@ fun desing(navController: NavController){
                     IconButton(
                         onClick = { /*TODO*/ }
                     ) {
-                        Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menú", modifier = Modifier.size(40.dp))
+                        Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menú", modifier = Modifier.size(MaterialTheme.dimens.medium3))
                     }
                 },
                 title = {
@@ -127,11 +128,11 @@ fun desing(navController: NavController){
             }
             TopAppBar(
                 navigationIcon = {
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(MaterialTheme.dimens.small1))
                     IconButton(
                         onClick = { showMenuDate = !showMenuDate  }
                     ) {
-                        Icon(imageVector = Icons.Filled.DateRange, contentDescription = "Fecha", modifier = Modifier.size(40.dp))
+                        Icon(imageVector = Icons.Filled.DateRange, contentDescription = "Fecha", modifier = Modifier.size(MaterialTheme.dimens.medium3))
                     }
                 },
                 title = {
@@ -154,7 +155,7 @@ fun desing(navController: NavController){
                                 Icons.Filled.KeyboardArrowUp,
                                 contentDescription = "Fecha",
                                 modifier = Modifier
-                                    .size(45.dp)
+                                    .size(MaterialTheme.dimens.medium3)
                                     .align(Alignment.CenterVertically),
                                 tint = MaterialTheme.colorScheme.onPrimary
                             )
@@ -179,7 +180,7 @@ fun desing(navController: NavController){
                                     }) {
                                     Icon(imageVector = Icons.Filled.DateRange,
                                         contentDescription = "Fecha")
-                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Spacer(modifier = Modifier.width(MaterialTheme.dimens.small1))
                                     Text(text = stringResource(id = R.string.hoy))
                                 }
                                 DropdownMenuItem(
@@ -190,7 +191,7 @@ fun desing(navController: NavController){
                                     }) {
                                     Icon(imageVector = Icons.Filled.DateRange,
                                         contentDescription = "Fecha")
-                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Spacer(modifier = Modifier.width(MaterialTheme.dimens.small1))
                                     Text(text = stringResource(id = R.string.semana))
                                 }
                                 DropdownMenuItem(
@@ -201,7 +202,7 @@ fun desing(navController: NavController){
                                     }){
                                     Icon(imageVector = Icons.Filled.DateRange,
                                         contentDescription = "Fecha")
-                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Spacer(modifier = Modifier.width(MaterialTheme.dimens.small1))
                                     Text(text = stringResource(id = R.string.mes))
                                 }
                                 DropdownMenuItem(
@@ -212,7 +213,7 @@ fun desing(navController: NavController){
                                     }){
                                     Icon(imageVector = Icons.Filled.DateRange,
                                         contentDescription = "Fecha")
-                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Spacer(modifier = Modifier.width(MaterialTheme.dimens.small1))
                                     Text(text = stringResource(id = R.string.todos))
                                 }
                             }
@@ -257,13 +258,13 @@ fun desing(navController: NavController){
             modifier = Modifier
                 .fillMaxWidth(1f)
                 .fillMaxHeight(0.92f)
-                .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 0.dp)
+                .padding(start = MaterialTheme.dimens.small3, top = MaterialTheme.dimens.small1, end = MaterialTheme.dimens.small3, bottom = 0.dp)
         ){
             LazyColumn(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .fillMaxWidth(0.9f)
-                    .padding(4.dp)
+                    .padding(MaterialTheme.dimens.small1)
             ){
                 // Botón de búsqueda
                 item {
@@ -274,32 +275,32 @@ fun desing(navController: NavController){
                         placeholder = { Text(text = stringResource(id = R.string.buscar)) },
                         leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = "Buscar") }
                     )
-                    Spacer(modifier = Modifier.height(25.dp))
+                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.medium1))
                 }
                 item {
                     // LISTADO DE DESTACADOS
                     Row {
                         Icon(imageVector = Icons.Filled.Star, contentDescription = "Destacados")
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(MaterialTheme.dimens.small1))
                         Text(text = stringResource(id = R.string.destacados), style = MaterialTheme.typography.bodyLarge)
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small1))
                     Divider()
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small1))
                     Tarjeta(titulo = "ARRIBA EL AMÉRICA", asunto = stringResource(id = R.string.tarea), fecha = "26/05/2013")
                     Tarjeta(titulo = "abajo las chivazzz", asunto = stringResource(id = R.string.nota), fecha = "03/10/2023")
-                    Spacer(modifier = Modifier.height(25.dp))
+                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small1))
                 }
                 item {
                     // LISTADO DE TARJETAS NORMALES
                     Row {
                         Icon(imageVector = Icons.Filled.Note, contentDescription = stringResource(id = R.string.notas_tareas))
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(MaterialTheme.dimens.small1))
                         Text(text = stringResource(id = R.string.notas_tareas), style = MaterialTheme.typography.bodyLarge)
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small1))
                     Divider()
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small1))
 
                   }
                 items(titulos.size) { index ->
@@ -312,7 +313,7 @@ fun desing(navController: NavController){
                 text = { Text(text = stringResource(id = R.string.agregar)) },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(bottom = 20.dp, start = 20.dp)
+                    .padding(bottom = MaterialTheme.dimens.medium1, start = MaterialTheme.dimens.medium1)
             )
         }
     }
