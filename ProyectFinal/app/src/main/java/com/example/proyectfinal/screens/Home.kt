@@ -74,8 +74,8 @@ fun BodyContentHome(navController: NavController){
     Box(modifier = Modifier.fillMaxSize()){
         Column(
             modifier = Modifier,
-                //.align(Alignment.Center)
-                //.background(colorResource(id = R.color.Secundario))
+            //.align(Alignment.Center)
+            //.background(colorResource(id = R.color.Secundario))
             horizontalAlignment = Alignment.CenterHorizontally
         ){
             desing(navController)
@@ -100,7 +100,7 @@ fun desing(navController: NavController){
                     IconButton(
                         onClick = { /*TODO*/ }
                     ) {
-                        Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menú", modifier = Modifier.size(MaterialTheme.dimens.medium3))
+                        Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menú", modifier = Modifier.size(MaterialTheme.dimens.medium2))
                     }
                 },
                 title = {
@@ -128,11 +128,11 @@ fun desing(navController: NavController){
             }
             TopAppBar(
                 navigationIcon = {
-                    Spacer(modifier = Modifier.width(MaterialTheme.dimens.small1))
+                    Spacer(modifier = Modifier.width(MaterialTheme.dimens.small3))
                     IconButton(
                         onClick = { showMenuDate = !showMenuDate  }
                     ) {
-                        Icon(imageVector = Icons.Filled.DateRange, contentDescription = "Fecha", modifier = Modifier.size(MaterialTheme.dimens.medium3))
+                        Icon(imageVector = Icons.Filled.DateRange, contentDescription = "Fecha", modifier = Modifier.size(MaterialTheme.dimens.medium2))
                     }
                 },
                 title = {
@@ -155,7 +155,7 @@ fun desing(navController: NavController){
                                 Icons.Filled.KeyboardArrowUp,
                                 contentDescription = "Fecha",
                                 modifier = Modifier
-                                    .size(MaterialTheme.dimens.medium3)
+                                    .size(MaterialTheme.dimens.medium2)
                                     .align(Alignment.CenterVertically),
                                 tint = MaterialTheme.colorScheme.onPrimary
                             )
@@ -180,7 +180,7 @@ fun desing(navController: NavController){
                                     }) {
                                     Icon(imageVector = Icons.Filled.DateRange,
                                         contentDescription = "Fecha")
-                                    Spacer(modifier = Modifier.width(MaterialTheme.dimens.small1))
+                                    Spacer(modifier = Modifier.width(MaterialTheme.dimens.small3))
                                     Text(text = stringResource(id = R.string.hoy))
                                 }
                                 DropdownMenuItem(
@@ -191,7 +191,7 @@ fun desing(navController: NavController){
                                     }) {
                                     Icon(imageVector = Icons.Filled.DateRange,
                                         contentDescription = "Fecha")
-                                    Spacer(modifier = Modifier.width(MaterialTheme.dimens.small1))
+                                    Spacer(modifier = Modifier.width(MaterialTheme.dimens.small3))
                                     Text(text = stringResource(id = R.string.semana))
                                 }
                                 DropdownMenuItem(
@@ -202,7 +202,7 @@ fun desing(navController: NavController){
                                     }){
                                     Icon(imageVector = Icons.Filled.DateRange,
                                         contentDescription = "Fecha")
-                                    Spacer(modifier = Modifier.width(MaterialTheme.dimens.small1))
+                                    Spacer(modifier = Modifier.width(MaterialTheme.dimens.small3))
                                     Text(text = stringResource(id = R.string.mes))
                                 }
                                 DropdownMenuItem(
@@ -213,7 +213,7 @@ fun desing(navController: NavController){
                                     }){
                                     Icon(imageVector = Icons.Filled.DateRange,
                                         contentDescription = "Fecha")
-                                    Spacer(modifier = Modifier.width(MaterialTheme.dimens.small1))
+                                    Spacer(modifier = Modifier.width(MaterialTheme.dimens.small3))
                                     Text(text = stringResource(id = R.string.todos))
                                 }
                             }
@@ -258,13 +258,13 @@ fun desing(navController: NavController){
             modifier = Modifier
                 .fillMaxWidth(1f)
                 .fillMaxHeight(0.92f)
-                .padding(start = MaterialTheme.dimens.small3, top = MaterialTheme.dimens.small1, end = MaterialTheme.dimens.small3, bottom = 0.dp)
+                .padding(start = MaterialTheme.dimens.medium1, top = MaterialTheme.dimens.medium3, end = MaterialTheme.dimens.medium1, bottom = 0.dp)
         ){
             LazyColumn(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .fillMaxWidth(0.9f)
-                    .padding(MaterialTheme.dimens.small1)
+                    .padding(MaterialTheme.dimens.small2)
             ){
                 // Botón de búsqueda
                 item {
@@ -281,28 +281,28 @@ fun desing(navController: NavController){
                     // LISTADO DE DESTACADOS
                     Row {
                         Icon(imageVector = Icons.Filled.Star, contentDescription = "Destacados")
-                        Spacer(modifier = Modifier.width(MaterialTheme.dimens.small1))
+                        Spacer(modifier = Modifier.width(MaterialTheme.dimens.small3))
                         Text(text = stringResource(id = R.string.destacados), style = MaterialTheme.typography.bodyLarge)
                     }
-                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small1))
+                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small2))
                     Divider()
-                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small1))
+                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small3))
                     Tarjeta(titulo = "ARRIBA EL AMÉRICA", asunto = stringResource(id = R.string.tarea), fecha = "26/05/2013")
                     Tarjeta(titulo = "abajo las chivazzz", asunto = stringResource(id = R.string.nota), fecha = "03/10/2023")
-                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small1))
+                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.medium1))
                 }
                 item {
                     // LISTADO DE TARJETAS NORMALES
                     Row {
                         Icon(imageVector = Icons.Filled.Note, contentDescription = stringResource(id = R.string.notas_tareas))
-                        Spacer(modifier = Modifier.width(MaterialTheme.dimens.small1))
+                        Spacer(modifier = Modifier.width(MaterialTheme.dimens.small3))
                         Text(text = stringResource(id = R.string.notas_tareas), style = MaterialTheme.typography.bodyLarge)
                     }
-                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small1))
+                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small2))
                     Divider()
-                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small1))
+                    Spacer(modifier = Modifier.height(MaterialTheme.dimens.small2))
 
-                  }
+                }
                 items(titulos.size) { index ->
                     Tarjeta(titulo = titulos[index], asunto = asuntos[index], fecha = fechas[index])
                 }
@@ -337,14 +337,14 @@ fun Tarjeta(titulo: String, asunto: String, fecha: String){
         Row(modifier = Modifier.fillMaxSize()){
             Column (
                 modifier = Modifier
-                    .padding(start = 10.dp, top = 4.dp, bottom = 8.dp)
+                    .padding(start = MaterialTheme.dimens.small3, top = MaterialTheme.dimens.small2, bottom = MaterialTheme.dimens.small3)
                     .fillMaxWidth(0.8f)
 
             ) {
                 Text(
                     text = titulo,
                     modifier = Modifier
-                        .padding(top = 6.dp),
+                        .padding(top = MaterialTheme.dimens.small2),
                     textAlign = TextAlign.Start,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
@@ -354,13 +354,13 @@ fun Tarjeta(titulo: String, asunto: String, fecha: String){
                 Text(
                     text = asunto,
                     modifier = Modifier
-                        .padding(2.dp),
+                        .padding(MaterialTheme.dimens.small1),
                     textAlign = TextAlign.Start
                 )
                 Text(
                     text = fecha,
                     modifier = Modifier
-                        .padding(2.dp),
+                        .padding(MaterialTheme.dimens.small1),
                     textAlign = TextAlign.Start
                 )
             }
@@ -370,7 +370,7 @@ fun Tarjeta(titulo: String, asunto: String, fecha: String){
                 Icon(painter = painterResource(id = R.drawable.points), contentDescription = null,
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
-                        .size(50.dp)
+                        .size(MaterialTheme.dimens.medium2)
                         .fillMaxSize())
             }
         }
@@ -378,7 +378,7 @@ fun Tarjeta(titulo: String, asunto: String, fecha: String){
     //Menu desplegable de cada asunto
     Box(modifier = Modifier
         .fillMaxSize()
-        .padding(start = 120.dp)) {
+        .padding(start = MaterialTheme.dimens.large)) {
         DropdownMenu(
             expanded = showMenuAffair,
             onDismissRequest = { showMenuAffair = false },
@@ -394,7 +394,7 @@ fun Tarjeta(titulo: String, asunto: String, fecha: String){
                     imageVector = Icons.Filled.Handshake,
                     contentDescription = "Terminado"
                 )
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(MaterialTheme.dimens.small3))
                 Text(text = stringResource(id = R.string.terminado))
             }
             DropdownMenuItem(
@@ -405,7 +405,7 @@ fun Tarjeta(titulo: String, asunto: String, fecha: String){
                     imageVector = Icons.Filled.Star,
                     contentDescription = "Destacar"
                 )
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(MaterialTheme.dimens.small3))
                 Text(text = stringResource(id = R.string.destacado))
             }
             DropdownMenuItem(
@@ -416,7 +416,7 @@ fun Tarjeta(titulo: String, asunto: String, fecha: String){
                     imageVector = Icons.Filled.Edit,
                     contentDescription = "Editar"
                 )
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(MaterialTheme.dimens.small3))
                 Text(text = stringResource(id = R.string.editar))
             }
             DropdownMenuItem(
@@ -427,13 +427,13 @@ fun Tarjeta(titulo: String, asunto: String, fecha: String){
                     imageVector = Icons.Filled.Delete,
                     contentDescription = "Eliminar"
                 )
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(MaterialTheme.dimens.small3))
                 Text(text = stringResource(id = R.string.eliminar))
             }
 
         }
     }
-    Spacer(modifier = Modifier.height(15.dp))
+    Spacer(modifier = Modifier.height(MaterialTheme.dimens.medium1))
 }
 
 
@@ -445,7 +445,3 @@ fun HomeScreen(navController: NavController){
         BodyContentHome(navController)
     }
 }
-
-
-
-

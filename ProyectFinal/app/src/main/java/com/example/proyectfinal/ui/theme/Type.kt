@@ -43,22 +43,22 @@ val CompactTypography = Typography (
     headlineLarge = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.ExtraBold,
-        fontSize = 18.sp
+        fontSize = 85.sp
     ),
     headlineMedium = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.Bold,
-        fontSize = 16.sp
+        fontSize = 85.sp
     ),
     titleMedium = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.Medium,
-        fontSize = 10.sp
+        fontSize = 70.sp
     ),
     labelMedium = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.Normal,
-        fontSize = 9.sp
+        fontSize = 55.sp
     )
 )
 
@@ -67,22 +67,22 @@ val CompactSmallTypography = Typography (
     headlineLarge = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.ExtraBold,
-        fontSize = 24.sp
+        fontSize = 30.sp
     ),
     headlineMedium = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.Bold,
-        fontSize = 18.sp
+        fontSize = 30.sp
     ),
     titleMedium = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.Medium,
-        fontSize = 12.sp
+        fontSize = 20.sp
     ),
     labelMedium = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.Normal,
-        fontSize = 11.sp
+        fontSize = 12.sp
     )
 )
 
@@ -91,22 +91,22 @@ val CompactMediumTypography = Typography (
     headlineLarge = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.ExtraBold,
-        fontSize = 28.sp
+        fontSize = 60.sp
     ),
     headlineMedium = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.Bold,
-        fontSize = 22.sp
+        fontSize = 60.sp
     ),
     titleMedium = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.Medium,
-        fontSize = 14.sp
+        fontSize = 40.sp
     ),
     labelMedium = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp
+        fontSize = 24.sp
     )
 )
 

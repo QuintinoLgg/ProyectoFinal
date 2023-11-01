@@ -131,7 +131,7 @@ fun ProyectFinalTheme(
                 typography = CompactSmallTypography
             }
             else if(config.screenWidthDp <= 599){
-                appDimens = CompactDimens
+                appDimens = CompactMediumDimens
                 typography = CompactMediumTypography
             }
             else{

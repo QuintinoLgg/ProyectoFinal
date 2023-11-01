@@ -3,6 +3,16 @@ package com.example.proyectfinal.ui.theme
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+/*
+2  (1-2 dp's)
+5  (4-6 dp's)
+10 (8-10 dp's)
+20 (20-25 dp's)
+40 (40-45 dp's)
+65 (50-80 dp's)
+120
+ */
+
 data class Dimens(
     val extraSmall: Dp = 0.dp,
     val small1: Dp = 0.dp,
@@ -16,34 +26,34 @@ data class Dimens(
 )
 
 val CompactSmallDimens = Dimens(
-    small1 = 4.dp,
-    small2 = 6.dp,
-    small3 = 8.dp,
-    medium1 = 12.dp,
-    medium2 = 15.dp,
-    medium3 = 18.dp,
-    large = 21.dp,
+    small1 = 2.dp,
+    small2 = 5.dp,
+    small3 = 10.dp,
+    medium1 = 20.dp,
+    medium2 = 40.dp,
+    medium3 = 65.dp,
+    large = 120.dp,
     buttonHeight = 30.dp
 )
 
 val CompactMediumDimens = Dimens(
-    small1 = 10.dp,
-    small2 = 12.dp,
-    small3 = 14.dp,
-    medium1 = 21.dp,
-    medium2 = 24.dp,
-    medium3 = 27.dp,
-    large = 65.dp
+    small1 = 3.dp,
+    small2 = 6.dp,
+    small3 = 12.dp,
+    medium1 = 24.dp,
+    medium2 = 45.dp,
+    medium3 = 70.dp,
+    large = 140.dp
 )
 
 val CompactDimens = Dimens(
-    small1 = 14.dp,
-    small2 = 16.dp,
-    small3 = 18.dp,
-    medium1 = 24.dp,
-    medium2 = 28.dp,
-    medium3 = 34.dp,
-    large = 80.dp
+    small1 = 5.dp,
+    small2 = 9.dp,
+    small3 = 15.dp,
+    medium1 = 28.dp,
+    medium2 = 53.dp,
+    medium3 = 80.dp,
+    large = 160.dp
 )
 
 val MediumDimens = Dimens(
