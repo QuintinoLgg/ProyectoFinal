@@ -243,21 +243,8 @@ private fun Tarjeta(titulo: String, descripcion: String){
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NotesScreen(navController: NavController, navigationType: NotesAppNavigationType){
-    if(navigationType==NotesAppNavigationType.PERMANENT_NAVIGATION_DRAWER){
-        PermanentNavigationDrawer(
-            drawerContent = {
-                MenuNavegacion(navController = navController)
-            }
-        ) {
-            Scaffold {
-                BodyContentNotesScreen(navController)
-            }
-        }
-    }
-    else{
-        Scaffold {
-            BodyContentNotesScreen(navController)
-        }
+    Scaffold {
+        BodyContentNotesScreen(navController)
     }
 
 }

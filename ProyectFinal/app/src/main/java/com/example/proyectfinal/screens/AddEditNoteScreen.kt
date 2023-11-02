@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -123,17 +124,16 @@ fun desingNote(navController: NavController){
     ){
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 20.dp, top = 30.dp, end = 20.dp, bottom = 20.dp)
+                .fillMaxWidth(1f)
+                .fillMaxHeight(0.92f)
+                .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 60.dp)
         ){
             var title by remember { mutableStateOf("")}
             var description by remember { mutableStateOf("")}
 
             LazyColumn(
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .fillMaxWidth(1f)
-                    .padding(start = 45.dp, end = 45.dp),
+                    .align(Alignment.Center),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 item{
@@ -218,7 +218,7 @@ fun desingNote(navController: NavController){
                         label = { Text(stringResource(id = R.string.descripcion)) },
                         placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) }
                     )
-                    Spacer(modifier = Modifier.height(60.dp))
+                    Spacer(modifier = Modifier.height(30.dp))
                 }
 
                 item {
