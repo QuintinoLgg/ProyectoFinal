@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import java.util.Calendar
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
@@ -49,8 +50,13 @@ import androidx.compose.material.icons.filled.Task
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -61,16 +67,17 @@ import com.example.proyectfinal.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
+import com.example.proyectfinal.data.dataNotas
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @Composable
-fun BodyContentAddEditNote(navController: NavController){
+fun BodyContentAddEditNote(navController: NavController, navigationType: NotesAppNavigationType){
     Box(modifier = Modifier.fillMaxSize()){
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            desingNote(navController)
+            Content(navController, navigationType)
         }
     }
 }
@@ -79,7 +86,7 @@ fun BodyContentAddEditNote(navController: NavController){
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun desingNote(navController: NavController){
+private fun Content(navController: NavController, navigationType: NotesAppNavigationType){
     //Variable de ViewModel
     val miViewModel = viewModel<MainViewModel>()
 
@@ -105,169 +112,245 @@ fun desingNote(navController: NavController){
             )
         },
         bottomBar = {
-            var selectedItem by remember { mutableStateOf(2) }
-            NavigationBar {
-                bottomNavItems.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        selected = selectedItem == index,
-                        onClick = {
-                            selectedItem = index
-                            navController.navigate(item.ruta)
-                        },
-                        label = { Text(text = item.nombre) },
-                        icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
-                    )
+            // PARA PANTALLAS COMPACTAS, USAR UNA BARRA DE NAVEGACION INFERIOR
+            if(navigationType == NotesAppNavigationType.BOTTOM_NAVIGATION){
+                NavigationBar {
+                    var selectedItem by remember { mutableStateOf(2) }
+                    bottomNavItems.forEachIndexed { index, item ->
+                        NavigationBarItem(
+                            selected = selectedItem == index,
+                            onClick = {
+                                selectedItem = index
+                                navController.navigate(item.ruta)
+                            },
+                            label = { Text(text = item.nombre) },
+                            icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
+                        )
+                    }
+                }
+            }
+            // PARA PANTALLAS MEDIUM O MEDIANAS, USAR UN NAVIGATION RAIL
+            else if(navigationType == NotesAppNavigationType.NAVIGATION_RAIL){
+                NavigationRail(
+                    modifier = Modifier.padding(top = 80.dp)
+                ) {
+                    var selectedItem by remember { mutableStateOf(2) }
+                    bottomNavItems.forEachIndexed { index, item ->
+                        NavigationRailItem(
+                            selected = selectedItem == index,
+                            onClick = {
+                                selectedItem = index
+                                navController.navigate(item.ruta)
+                            },
+                            label = { Text(text = item.nombre) },
+                            icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
+                        )
+                    }
+                }
+            }
+            // PARA PANTALLAS GRANDES O EXTENSAS, USAR UN NAVIGATION DRAWER
+            else if(navigationType == NotesAppNavigationType.PERMANENT_NAVIGATION_DRAWER){
+                PermanentNavigationDrawer(
+                    drawerContent = {
+                        ModalDrawerSheet(
+                            modifier = Modifier.fillMaxWidth(0.2f)
+                        ) {
+                            var selectedItem by remember { mutableStateOf(2) }
+                            bottomNavItems.forEachIndexed { index, item ->
+                                NavigationDrawerItem(
+                                    selected = selectedItem == index,
+                                    onClick = {
+                                        selectedItem = index
+                                        navController.navigate(item.ruta)
+                                    },
+                                    label = { Text(text = item.nombre) },
+                                    icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
+                                )
+                            }
+                        }
+                    },
+                    Modifier.padding(top = 80.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(start = 20.dp, top = 5.dp, end = 20.dp, bottom = 5.dp)
+                    ){
+                        UI(miViewModel, navController)
+                    }
                 }
             }
         }
 
     ){
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(1f)
-                .fillMaxHeight(0.92f)
-                .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 60.dp)
-        ){
-            var title by remember { mutableStateOf("")}
-            var description by remember { mutableStateOf("")}
-
-            LazyColumn(
+        // CONTENIDO PARA PANTALLAS COMPACTAS
+        if(navigationType == NotesAppNavigationType.BOTTOM_NAVIGATION){
+            Box(
                 modifier = Modifier
-                    .align(Alignment.Center),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth(1f)
+                    .fillMaxHeight(0.92f)
+                    .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 0.dp)
             ){
-                item{
-                    // CAJA DE TEXTO DE TITULO
-                    TextField(
-                        value = title,
-                        onValueChange = { title = it },
-                        label = { Text(stringResource(id = R.string.titulo)) },
-                        placeholder = { Text(stringResource(id = R.string.agregar_titulo)) }
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
+                UI(miViewModel, navController)
+            }
+        }
+        // CONTENIDO PARA PANTALLAS MEDIANAS
+        else if(navigationType == NotesAppNavigationType.NAVIGATION_RAIL){
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .fillMaxHeight(0.92f)
+                    .padding(start = 80.dp, top = 80.dp, end = 20.dp, bottom = 20.dp)
+            ){
+                UI(miViewModel, navController)
+            }
+        }
+        // PARA PANTALLAS EXTENSAS, EL CONTENIDO SE INCLUYE CON EL NAVIGATION DRAWER
 
-                item {
-                    // COMBOBOX PARA ESCOGER NOTA O TAREA
-                    val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
-                    ComboBox(options, stringResource(id = R.string.asunto))
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
+    }
+}
 
-                item {
-                    // DATETIMEPICKER PARA SELECCIONAR LA FECHA DE LA NOTA
-                    DatePicker()
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
 
-                item {
-                    // BOTONES DE MULTIMEDIA
-                    Column (
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
+@Composable
+private fun UI(miViewModel: MainViewModel, navController: NavController){
+    var title by remember { mutableStateOf("")}
+    var description by remember { mutableStateOf("")}
+
+    LazyColumn(
+        modifier = Modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        item{
+            // CAJA DE TEXTO DE TITULO
+            TextField(
+                value = title,
+                onValueChange = { title = it },
+                label = { Text(stringResource(id = R.string.titulo)) },
+                placeholder = { Text(stringResource(id = R.string.agregar_titulo)) }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        item {
+            // COMBOBOX PARA ESCOGER NOTA O TAREA
+            val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
+            ComboBox(options, stringResource(id = R.string.asunto))
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        item {
+            // DATETIMEPICKER PARA SELECCIONAR LA FECHA DE LA NOTA
+            DatePicker()
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        item {
+            // BOTONES DE MULTIMEDIA
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(id = R.string.apartado_multimedia),
+                    fontSize = 15.sp,
+                    textAlign = TextAlign.Center
+                )
+                Row {
+                    // BOTON DE GALERIA
+                    Button(
+                        onClick = { /*TODO*/ }
                     ) {
-                        Text(
-                            text = stringResource(id = R.string.apartado_multimedia),
-                            fontSize = 15.sp,
-                            textAlign = TextAlign.Center
+                        Icon(
+                            Icons.Filled.Image,
+                            contentDescription = "Galería",
+                            modifier = Modifier.size(25.dp)
                         )
-                        Row {
-                            // BOTON DE GALERIA
-                            Button(
-                                onClick = { /*TODO*/ }
-                            ) {
-                                Icon(
-                                    Icons.Filled.Image,
-                                    contentDescription = "Galería",
-                                    modifier = Modifier.size(25.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(10.dp))
-                            // BOTON DE GRABADORA
-                            Button(
-                                onClick = { /*TODO*/ }
-                            ) {
-                                Icon(
-                                    Icons.Filled.Mic,
-                                    contentDescription = "Micrófono",
-                                    modifier = Modifier.size(25.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(10.dp))
-                            // BOTON DE OPCIONES
-                            Button(
-                                onClick = { /*TODO*/ }
-                            ) {
-                                Icon(
-                                    Icons.Default.MoreVert,
-                                    contentDescription = "Más opciones",
-                                    modifier = Modifier.size(25.dp)
-                                )
-                            }
-                        }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
-                item {
-                    // CAJA DE TEXTO PARA LA DESCRIPCI[ON
-                    TextField(
-                        value = description,
-                        onValueChange = { description = it },
-                        label = { Text(stringResource(id = R.string.descripcion)) },
-                        placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) }
-                    )
-                    Spacer(modifier = Modifier.height(30.dp))
-                }
-
-                item {
-                    // BOTÓN GUARDAR Y CANCELAR
-                    Row {
-                        val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
-                        // BOTON DE GUARDAR
-                        Button(
-                            onClick = {
-                                miViewModel.tittle = title
-                                miViewModel.subject = options.toString()
-                                miViewModel.description = description
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceTint,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            )
-                        ) {
-                            Icon(
-                                Icons.Default.Check,
-                                contentDescription = "Guardar",
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(stringResource(id = R.string.guardar))
-                        }
-                        Spacer(modifier = Modifier.width(10.dp))
-                        // BOTON DE CANCELAR
-                        Button(
-                            onClick = { navController.popBackStack() },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.error,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            )
-                        ) {
-                            Icon(
-                                Icons.Default.Clear,
-                                contentDescription = "Cancelar",
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(stringResource(id = R.string.cancelar))
-                        }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    // BOTON DE GRABADORA
+                    Button(
+                        onClick = { /*TODO*/ }
+                    ) {
+                        Icon(
+                            Icons.Filled.Mic,
+                            contentDescription = "Micrófono",
+                            modifier = Modifier.size(25.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    // BOTON DE OPCIONES
+                    Button(
+                        onClick = { /*TODO*/ }
+                    ) {
+                        Icon(
+                            Icons.Default.MoreVert,
+                            contentDescription = "Más opciones",
+                            modifier = Modifier.size(25.dp)
+                        )
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
+        item {
+            // CAJA DE TEXTO PARA LA DESCRIPCI[ON
+            TextField(
+                value = description,
+                onValueChange = { description = it },
+                label = { Text(stringResource(id = R.string.descripcion)) },
+                placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) }
+            )
+            Spacer(modifier = Modifier.height(30.dp))
+        }
+
+        item {
+            // BOTÓN GUARDAR Y CANCELAR
+            Row {
+                val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
+                // BOTON DE GUARDAR
+                Button(
+                    onClick = {
+                        miViewModel.tittle = title
+                        miViewModel.subject = options.toString()
+                        miViewModel.description = description
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceTint,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Icon(
+                        Icons.Default.Check,
+                        contentDescription = "Guardar",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(stringResource(id = R.string.guardar))
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+                // BOTON DE CANCELAR
+                Button(
+                    onClick = { navController.popBackStack() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Icon(
+                        Icons.Default.Clear,
+                        contentDescription = "Cancelar",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(stringResource(id = R.string.cancelar))
+                }
+            }
         }
     }
+
 }
 
 
@@ -353,7 +436,7 @@ fun ComboBox(items: List<String>, etiqueta: String) {
 @Composable
 fun AddEditNoteScreen(navController: NavController, navigationType: NotesAppNavigationType){
     Scaffold {
-        BodyContentAddEditNote(navController)
+        BodyContentAddEditNote(navController, navigationType)
     }
 }
 

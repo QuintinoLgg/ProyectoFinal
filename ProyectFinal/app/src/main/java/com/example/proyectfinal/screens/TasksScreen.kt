@@ -51,8 +51,13 @@ import androidx.compose.material.icons.filled.Handshake
 import androidx.compose.material.icons.filled.Task
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -62,13 +67,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
+import com.example.proyectfinal.data.dataNotas
 import com.example.proyectfinal.data.dataTareas
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
 
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @Composable
-fun BodyContentTasksScreen(navController: NavController){
+fun BodyContentTasksScreen(navController: NavController, navigationType: NotesAppNavigationType){
     Box(modifier = Modifier.fillMaxSize()){
         Column(
             modifier = Modifier,
@@ -76,7 +82,7 @@ fun BodyContentTasksScreen(navController: NavController){
             //.background(colorResource(id = R.color.Secundario))
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            desing(navController)
+            Content(navController, navigationType)
         }
 
     }
@@ -85,7 +91,7 @@ fun BodyContentTasksScreen(navController: NavController){
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun desing(navController: NavController){
+private fun Content(navController: NavController, navigationType: NotesAppNavigationType){
 
     //Variable para el ViewModel
     val miViewModel = viewModel<MainViewModel>()
@@ -112,41 +118,127 @@ private fun desing(navController: NavController){
             )
         },
         bottomBar = {
-            NavigationBar {
-                var selectedItem by remember { mutableStateOf(1) }
-                bottomNavItems.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        selected = selectedItem == index,
-                        onClick = {
-                            selectedItem = index
-                            navController.navigate(item.ruta)
-                        },
-                        label = { Text(text = item.nombre) },
-                        icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
-                    )
+            // PARA PANTALLAS COMPACTAS, USAR UNA BARRA DE NAVEGACION INFERIOR
+            if(navigationType == NotesAppNavigationType.BOTTOM_NAVIGATION){
+                NavigationBar {
+                    var selectedItem by remember { mutableStateOf(1) }
+                    bottomNavItems.forEachIndexed { index, item ->
+                        NavigationBarItem(
+                            selected = selectedItem == index,
+                            onClick = {
+                                selectedItem = index
+                                navController.navigate(item.ruta)
+                            },
+                            label = { Text(text = item.nombre) },
+                            icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
+                        )
+                    }
                 }
             }
+            // PARA PANTALLAS MEDIUM O MEDIANAS, USAR UN NAVIGATION RAIL
+            else if(navigationType == NotesAppNavigationType.NAVIGATION_RAIL){
+                NavigationRail(
+                    modifier = Modifier.padding(top = 80.dp)
+                ) {
+                    var selectedItem by remember { mutableStateOf(1) }
+                    bottomNavItems.forEachIndexed { index, item ->
+                        NavigationRailItem(
+                            selected = selectedItem == index,
+                            onClick = {
+                                selectedItem = index
+                                navController.navigate(item.ruta)
+                            },
+                            label = { Text(text = item.nombre) },
+                            icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
+                        )
+                    }
+                }
+            }
+            // PARA PANTALLAS GRANDES O EXTENSAS, USAR UN NAVIGATION DRAWER
+            else if(navigationType == NotesAppNavigationType.PERMANENT_NAVIGATION_DRAWER){
+                PermanentNavigationDrawer(
+                    drawerContent = {
+                        ModalDrawerSheet(
+                            modifier = Modifier.fillMaxWidth(0.2f)
+                        ) {
+                            var selectedItem by remember { mutableStateOf(1) }
+                            bottomNavItems.forEachIndexed { index, item ->
+                                NavigationDrawerItem(
+                                    selected = selectedItem == index,
+                                    onClick = {
+                                        selectedItem = index
+                                        navController.navigate(item.ruta)
+                                    },
+                                    label = { Text(text = item.nombre) },
+                                    icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
+                                )
+                            }
+                        }
+                    },
+                    Modifier.padding(top = 80.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(start = 20.dp, top = 5.dp, end = 20.dp, bottom = 5.dp)
+                    ){
+                        LazyColumn(
+                            modifier = Modifier
+                                .padding(4.dp)
+                        ){
+                            items(dataTareas){
+                                Tarjeta(titulo = it.titulo, descripcion = it.descripcion, it.fecha)
+                            }
+
+                        }
+                    }
+                }
+            }
+
         }
 
     ){
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(1f)
-                .fillMaxHeight(0.92f)
-                .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 0.dp)
-        ){
-            LazyColumn(
+        // CONTENIDO PARA PANTALLAS COMPACTAS
+        if(navigationType == NotesAppNavigationType.BOTTOM_NAVIGATION){
+            Box(
                 modifier = Modifier
-                    .padding(4.dp)
+                    .fillMaxWidth(1f)
+                    .fillMaxHeight(0.92f)
+                    .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 0.dp)
             ){
-                items(dataTareas){
-                    Tarjeta(titulo = it.titulo, descripcion = it.descripcion, it.fecha)
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(4.dp)
+                ){
+                    items(dataTareas){
+                        Tarjeta(titulo = it.titulo, descripcion = it.descripcion, it.fecha)
+                    }
+
                 }
-
             }
-
         }
+        // CONTENIDO PARA PANTALLAS MEDIANAS
+        else if(navigationType == NotesAppNavigationType.NAVIGATION_RAIL){
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .fillMaxHeight(0.92f)
+                    .padding(start = 80.dp, top = 80.dp, end = 20.dp, bottom = 20.dp)
+            ){
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(4.dp)
+                ){
+                    items(dataTareas){
+                        Tarjeta(titulo = it.titulo, descripcion = it.descripcion, it.fecha)
+                    }
+
+                }
+            }
+        }
+        // PARA PANTALLAS EXTENSAS, EL CONTENIDO SE INCLUYE CON EL NAVIGATION DRAWER
+
     }
 }
 
@@ -261,6 +353,6 @@ private fun Tarjeta(titulo: String, descripcion: String, fecha: String){
 @Composable
 fun TasksScreen(navController: NavController, navigationType: NotesAppNavigationType){
     Scaffold {
-        BodyContentTasksScreen(navController)
+        BodyContentTasksScreen(navController, navigationType)
     }
 }

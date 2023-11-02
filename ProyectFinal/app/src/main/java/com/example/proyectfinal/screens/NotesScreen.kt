@@ -52,8 +52,13 @@ import androidx.compose.material.icons.filled.Task
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -70,7 +75,7 @@ import com.example.proyectfinal.ui.utils.NotesAppNavigationType
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @Composable
-fun BodyContentNotesScreen(navController: NavController){
+fun BodyContentNotesScreen(navController: NavController, navigationType: NotesAppNavigationType){
     Box(modifier = Modifier.fillMaxSize()){
         Column(
             modifier = Modifier,
@@ -78,7 +83,7 @@ fun BodyContentNotesScreen(navController: NavController){
                 //.background(colorResource(id = R.color.Secundario))
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            desing(navController)
+            Content(navController, navigationType)
         }
 
     }
@@ -87,7 +92,159 @@ fun BodyContentNotesScreen(navController: NavController){
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun desing(navController: NavController){
+private fun Content(navController: NavController, navigationType: NotesAppNavigationType){
+    //Variable para el ViewModel
+    val miViewModel = viewModel<MainViewModel>()
+    Scaffold (
+        topBar = {
+            var MyTitle = stringResource(id = R.string.notas)
+            TopAppBar(
+                title = {
+                    Row(
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = MyTitle,
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+        },
+        bottomBar = {
+            // PARA PANTALLAS COMPACTAS, USAR UNA BARRA DE NAVEGACION INFERIOR
+            if(navigationType == NotesAppNavigationType.BOTTOM_NAVIGATION){
+                NavigationBar {
+                    var selectedItem by remember { mutableStateOf(0) }
+                    bottomNavItems.forEachIndexed { index, item ->
+                        NavigationBarItem(
+                            selected = selectedItem == index,
+                            onClick = {
+                                selectedItem = index
+                                navController.navigate(item.ruta)
+                            },
+                            label = { Text(text = item.nombre) },
+                            icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
+                        )
+                    }
+                }
+            }
+            // PARA PANTALLAS MEDIUM O MEDIANAS, USAR UN NAVIGATION RAIL
+            else if(navigationType == NotesAppNavigationType.NAVIGATION_RAIL){
+                NavigationRail(
+                    modifier = Modifier.padding(top = 80.dp)
+                ) {
+                    var selectedItem by remember { mutableStateOf(0) }
+                    bottomNavItems.forEachIndexed { index, item ->
+                        NavigationRailItem(
+                            selected = selectedItem == index,
+                            onClick = {
+                                selectedItem = index
+                                navController.navigate(item.ruta)
+                            },
+                            label = { Text(text = item.nombre) },
+                            icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
+                        )
+                    }
+                }
+            }
+            // PARA PANTALLAS GRANDES O EXTENSAS, USAR UN NAVIGATION DRAWER
+            else if(navigationType == NotesAppNavigationType.PERMANENT_NAVIGATION_DRAWER){
+                PermanentNavigationDrawer(
+                    drawerContent = {
+                        ModalDrawerSheet(
+                            modifier = Modifier.fillMaxWidth(0.2f)
+                        ) {
+                            var selectedItem by remember { mutableStateOf(0) }
+                            bottomNavItems.forEachIndexed { index, item ->
+                                NavigationDrawerItem(
+                                    selected = selectedItem == index,
+                                    onClick = {
+                                        selectedItem = index
+                                        navController.navigate(item.ruta)
+                                    },
+                                    label = { Text(text = item.nombre) },
+                                    icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
+                                )
+                            }
+                        }
+                    },
+                    Modifier.padding(top = 80.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(start = 20.dp, top = 5.dp, end = 20.dp, bottom = 5.dp)
+                    ){
+                        LazyColumn(
+                            modifier = Modifier
+                                .padding(4.dp)
+                        ){
+                            items(dataNotas){
+                                Tarjeta(titulo = it.titulo, descripcion = it.descripcion)
+                            }
+
+                        }
+                    }
+                }
+            }
+
+        }
+    ){
+        // CONTENIDO PARA PANTALLAS COMPACTAS
+        if(navigationType == NotesAppNavigationType.BOTTOM_NAVIGATION){
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .fillMaxHeight(0.92f)
+                    .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 0.dp)
+            ){
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(4.dp)
+                ){
+                    items(dataNotas){
+                        Tarjeta(titulo = it.titulo, descripcion = it.descripcion)
+                    }
+
+                }
+            }
+        }
+        // CONTENIDO PARA PANTALLAS MEDIANAS
+        else if(navigationType == NotesAppNavigationType.NAVIGATION_RAIL){
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .fillMaxHeight(0.92f)
+                    .padding(start = 80.dp, top = 80.dp, end = 20.dp, bottom = 20.dp)
+            ){
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(4.dp)
+                ){
+                    items(dataNotas){
+                        Tarjeta(titulo = it.titulo, descripcion = it.descripcion)
+                    }
+
+                }
+            }
+        }
+        // PARA PANTALLAS EXTENSAS, EL CONTENIDO SE INCLUYE CON EL NAVIGATION DRAWER
+
+    }
+}
+
+/*
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MediumStyle(navController: NavController){
 
     //Variable para el ViewModel
     val miViewModel = viewModel<MainViewModel>()
@@ -114,16 +271,29 @@ private fun desing(navController: NavController){
             )
         },
         bottomBar = {
-            MenuNavegacion(navController = navController)
+            NavigationRail(
+                modifier = Modifier.padding(top = 80.dp)
+            ) {
+                var selectedItem by remember { mutableStateOf(0) }
+                bottomNavItems.forEachIndexed { index, item ->
+                    NavigationRailItem(
+                        selected = selectedItem == index,
+                        onClick = {
+                            selectedItem = index
+                            navController.navigate(item.ruta)
+                        },
+                        label = { Text(text = item.nombre) },
+                        icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
+                    )
+                }
+            }
         }
-
     ){
-
         Box(
             modifier = Modifier
                 .fillMaxWidth(1f)
                 .fillMaxHeight(0.92f)
-                .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 0.dp)
+                .padding(start = 80.dp, top = 80.dp, end = 20.dp, bottom = 20.dp)
         ){
             LazyColumn(
                 modifier = Modifier
@@ -132,13 +302,12 @@ private fun desing(navController: NavController){
                 items(dataNotas){
                     Tarjeta(titulo = it.titulo, descripcion = it.descripcion)
                 }
-                
-            }
 
+            }
         }
     }
 }
-
+*/
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -244,27 +413,8 @@ private fun Tarjeta(titulo: String, descripcion: String){
 @Composable
 fun NotesScreen(navController: NavController, navigationType: NotesAppNavigationType){
     Scaffold {
-        BodyContentNotesScreen(navController)
+        BodyContentNotesScreen(navController, navigationType)
     }
 
 }
-
-@Composable
-fun MenuNavegacion(navController: NavController){
-    NavigationBar {
-        var selectedItem by remember { mutableStateOf(0) }
-        bottomNavItems.forEachIndexed { index, item ->
-            NavigationBarItem(
-                selected = selectedItem == index,
-                onClick = {
-                    selectedItem = index
-                    navController.navigate(item.ruta)
-                },
-                label = { Text(text = item.nombre) },
-                icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
-            )
-        }
-    }
-}
-
 
