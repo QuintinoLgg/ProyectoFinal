@@ -60,6 +60,7 @@ import com.example.proyectfinal.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
+import com.example.proyectfinal.ui.utils.NotesAppNavigationType
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @Composable
@@ -350,7 +351,7 @@ fun ComboBox(items: List<String>, etiqueta: String) {
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun AddEditNoteScreen(navController: NavController){
+fun AddEditNoteScreen(navController: NavController, navigationType: NotesAppNavigationType){
     Scaffold {
         BodyContentAddEditNote(navController)
     }

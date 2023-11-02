@@ -54,6 +54,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -64,6 +65,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
 import com.example.proyectfinal.data.dataNotas
+import com.example.proyectfinal.ui.utils.NotesAppNavigationType
 
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
@@ -112,20 +114,7 @@ private fun desing(navController: NavController){
             )
         },
         bottomBar = {
-            NavigationBar {
-                var selectedItem by remember { mutableStateOf(0) }
-                bottomNavItems.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        selected = selectedItem == index,
-                        onClick = {
-                            selectedItem = index
-                            navController.navigate(item.ruta)
-                        },
-                        label = { Text(text = item.nombre) },
-                        icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
-                    )
-                }
-            }
+            MenuNavegacion(navController = navController)
         }
 
     ){
@@ -253,9 +242,41 @@ private fun Tarjeta(titulo: String, descripcion: String){
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun NotesScreen(navController: NavController){
-    Scaffold {
-        BodyContentNotesScreen(navController)
+fun NotesScreen(navController: NavController, navigationType: NotesAppNavigationType){
+    if(navigationType==NotesAppNavigationType.PERMANENT_NAVIGATION_DRAWER){
+        PermanentNavigationDrawer(
+            drawerContent = {
+                MenuNavegacion(navController = navController)
+            }
+        ) {
+            Scaffold {
+                BodyContentNotesScreen(navController)
+            }
+        }
+    }
+    else{
+        Scaffold {
+            BodyContentNotesScreen(navController)
+        }
+    }
+
+}
+
+@Composable
+fun MenuNavegacion(navController: NavController){
+    NavigationBar {
+        var selectedItem by remember { mutableStateOf(0) }
+        bottomNavItems.forEachIndexed { index, item ->
+            NavigationBarItem(
+                selected = selectedItem == index,
+                onClick = {
+                    selectedItem = index
+                    navController.navigate(item.ruta)
+                },
+                label = { Text(text = item.nombre) },
+                icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
+            )
+        }
     }
 }
 

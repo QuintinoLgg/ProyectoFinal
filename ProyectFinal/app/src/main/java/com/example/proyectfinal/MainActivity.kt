@@ -31,6 +31,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,37 +54,31 @@ import com.example.proyectfinal.navigation.AppNavigation
 import com.example.proyectfinal.ui.theme.ProyectFinalTheme
 import com.example.proyectfinal.screens.NotesScreen
 
+
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ProyectFinalTheme {
+                val windowSize = calculateWindowSizeClass(this)
                 Surface {
-                    AppNavigation()
+                    AppNavigation(windowSize.widthSizeClass)
                 }
             }
         }
     }
 }
 
-/*
-//Funcion solo usada para ver la preview, sin uso mayor.
-// Solo llamar la funcion que contiene el diseño
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview
-@Composable
-fun DefaultPreview(){
-    ProyectFinalTheme {
-        AppNavigation()
-    }
-}*/
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun DefaultPreview(){
     ProyectFinalTheme (darkTheme = false) {
-        AppNavigation()
+        AppNavigation(
+            windowSize = WindowWidthSizeClass.Compact
+        )
     }
 }
