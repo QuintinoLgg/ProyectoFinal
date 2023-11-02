@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.proyectfinal.navigation.AppNavigation
 import com.example.proyectfinal.ui.theme.ProyectFinalTheme
-import com.example.proyectfinal.screens.HomeScreen
+import com.example.proyectfinal.screens.NotesScreen
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)

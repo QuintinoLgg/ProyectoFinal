@@ -31,4 +31,7 @@
     <string name="guardar">Guardar</string>
     <string name="cancelar">Cancelar</string>
     <string name="selecciona_fecha">Selecciona una fecha</string>
+
+    <string name="tareas">Tareas</string>
+    <string name="notas">Notas</string>
 </resources>

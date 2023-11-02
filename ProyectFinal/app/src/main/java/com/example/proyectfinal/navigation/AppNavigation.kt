@@ -9,7 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.proyectfinal.screens.AddEditNoteScreen
-import com.example.proyectfinal.screens.HomeScreen
+import com.example.proyectfinal.screens.NotesScreen
+import com.example.proyectfinal.screens.TasksScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalFoundationApi::class)
@@ -18,10 +19,13 @@ fun AppNavigation(){
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = AppScreens.HomeScreen.route
+        startDestination = AppScreens.NotesScreen.route
     ){
-        composable(route = AppScreens.HomeScreen.route){
-            HomeScreen(navController)
+        composable(route = AppScreens.NotesScreen.route){
+            NotesScreen(navController)
+        }
+        composable(route = AppScreens.TasksScreen.route){
+            TasksScreen(navController)
         }
         composable(route = AppScreens.AddEditNoteScreen.route){
             AddEditNoteScreen(navController)

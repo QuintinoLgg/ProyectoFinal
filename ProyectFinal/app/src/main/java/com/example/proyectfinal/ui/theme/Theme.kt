@@ -1,7 +1,6 @@
 package com.example.proyectfinal.ui.theme
 
 import android.app.Activity
-import android.app.LocaleConfig
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -18,11 +17,6 @@ import androidx.core.view.WindowCompat
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.ui.platform.LocalConfiguration
-import com.example.proyectfinal.MainActivity
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -91,13 +85,11 @@ private val DarkColors = darkColorScheme(
 
 
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun ProyectFinalTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
-    activity: Activity = LocalContext.current as MainActivity,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -117,52 +109,10 @@ fun ProyectFinalTheme(
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
         }
     }
-    
-    val window = calculateWindowSizeClass(activity = activity)
-    val config = LocalConfiguration.current
 
-    var typography = CompactTypography
-    var appDimens = CompactDimens
-
-    when(window.widthSizeClass){
-        WindowWidthSizeClass.Compact -> {
-            if(config.screenWidthDp <= 360){
-                appDimens = CompactSmallDimens
-                typography = CompactSmallTypography
-            }
-            else if(config.screenWidthDp <= 599){
-                appDimens = CompactMediumDimens
-                typography = CompactMediumTypography
-            }
-            else{
-                appDimens = CompactDimens
-                typography = CompactTypography
-            }
-        }
-
-        WindowWidthSizeClass.Medium ->  {
-            appDimens = CompactDimens
-            typography = MediumTypography
-        }
-        else -> {
-            appDimens = ExpandedDimens
-            typography = ExpandedTypography
-        }
-    }
-    
-    AppUtils(
-        appDimens = appDimens
-    ) {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            typography = Typography,
-            content = content
-        )
-    }
-
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = Typography,
+        content = content
+    )
 }
-
-
-val MaterialTheme.dimens
-    @Composable
-    get() = LocalAppDimes.current
