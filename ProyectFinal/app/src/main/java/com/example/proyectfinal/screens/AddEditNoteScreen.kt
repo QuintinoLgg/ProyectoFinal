@@ -60,6 +60,7 @@ import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
@@ -214,8 +215,7 @@ private fun Content(navController: NavController, navigationType: NotesAppNaviga
 
 @Composable
 private fun UI(miViewModel: MainViewModel, navController: NavController){
-    var title by remember { mutableStateOf("")}
-    var description by remember { mutableStateOf("")}
+
 
     LazyColumn(
         modifier = Modifier,
@@ -224,8 +224,10 @@ private fun UI(miViewModel: MainViewModel, navController: NavController){
         item{
             // CAJA DE TEXTO DE TITULO
             TextField(
-                value = title,
-                onValueChange = { title = it },
+                value = miViewModel.title.value,
+                onValueChange = { newTitle ->
+                    miViewModel.setTitle(newTitle)
+                },
                 label = { Text(stringResource(id = R.string.titulo)) },
                 placeholder = { Text(stringResource(id = R.string.agregar_titulo)) }
             )
@@ -235,13 +237,13 @@ private fun UI(miViewModel: MainViewModel, navController: NavController){
         item {
             // COMBOBOX PARA ESCOGER NOTA O TAREA
             val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
-            ComboBox(options, stringResource(id = R.string.asunto))
+            ComboBox(options, stringResource(id = R.string.asunto),miViewModel)
             Spacer(modifier = Modifier.height(16.dp))
         }
 
         item {
             // DATETIMEPICKER PARA SELECCIONAR LA FECHA DE LA NOTA
-            DatePicker()
+            DatePicker(miViewModel)
             Spacer(modifier = Modifier.height(16.dp))
         }
 
@@ -298,8 +300,10 @@ private fun UI(miViewModel: MainViewModel, navController: NavController){
         item {
             // CAJA DE TEXTO PARA LA DESCRIPCI[ON
             TextField(
-                value = description,
-                onValueChange = { description = it },
+                value = miViewModel.description.value,
+                onValueChange = { newDescription ->
+                    miViewModel.setDescription(newDescription)
+                },
                 label = { Text(stringResource(id = R.string.descripcion)) },
                 placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) }
             )
@@ -313,9 +317,6 @@ private fun UI(miViewModel: MainViewModel, navController: NavController){
                 // BOTON DE GUARDAR
                 Button(
                     onClick = {
-                        miViewModel.tittle = title
-                        miViewModel.subject = options.toString()
-                        miViewModel.description = description
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceTint,
@@ -359,7 +360,7 @@ private fun UI(miViewModel: MainViewModel, navController: NavController){
 // DATETIME PICKER PERSONALIZADO
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePicker(){
+fun DatePicker(miViewModel: MainViewModel){
     var fecha by rememberSaveable {
         mutableStateOf("")
     }
@@ -373,15 +374,18 @@ fun DatePicker(){
 
     val nDatePickerDialog = DatePickerDialog(
         LocalContext.current,
-        {
-                _, year: Int, month: Int, day: Int -> fecha = "$day/$month/$year"
+        { _, year: Int, month: Int, day: Int ->
+            fecha = "$day/$month/$year"
+            miViewModel.setdate(fecha) // Aquí establece la fecha en el ViewModel
         },
         year, month, day
     )
 
     TextField(
-        value = fecha,
-        onValueChange = {fecha = it},
+        value = miViewModel.date.value,
+        onValueChange = { newDate ->
+            miViewModel.setdate(newDate)
+        },
         readOnly = true,
         label = { Text(stringResource(id = R.string.fecha)) },
         placeholder = { Text(stringResource(id = R.string.selecciona_fecha)) },
@@ -398,7 +402,7 @@ fun DatePicker(){
 // COMBOBOX PERSONALIZADO
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ComboBox(items: List<String>, etiqueta: String) {
+fun ComboBox(items: List<String>, etiqueta: String, miViewModel: MainViewModel) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf(items[0]) }
 
@@ -409,7 +413,7 @@ fun ComboBox(items: List<String>, etiqueta: String) {
         TextField(
             modifier = Modifier.menuAnchor(),
             readOnly = true,
-            value = selectedOptionText,
+            value = miViewModel.subject.value,
             onValueChange = {},
             label = { Text(etiqueta) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
@@ -422,7 +426,7 @@ fun ComboBox(items: List<String>, etiqueta: String) {
                 DropdownMenuItem(
                     text = { Text(text = item) },
                     onClick = {
-                        selectedOptionText = item
+                        miViewModel.subject.value = item
                         expanded = false
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
