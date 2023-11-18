@@ -2,6 +2,14 @@ package com.example.proyectfinal.screens
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -61,6 +69,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
@@ -248,53 +257,7 @@ private fun UI(miViewModel: MainViewModel, navController: NavController){
         }
 
         item {
-            // BOTONES DE MULTIMEDIA
-            Column (
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(id = R.string.apartado_multimedia),
-                    fontSize = 15.sp,
-                    textAlign = TextAlign.Center
-                )
-                Row {
-                    // BOTON DE GALERIA
-                    Button(
-                        onClick = { /*TODO*/ }
-                    ) {
-                        Icon(
-                            Icons.Filled.Image,
-                            contentDescription = "Galería",
-                            modifier = Modifier.size(25.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(10.dp))
-                    // BOTON DE GRABADORA
-                    Button(
-                        onClick = { /*TODO*/ }
-                    ) {
-                        Icon(
-                            Icons.Filled.Mic,
-                            contentDescription = "Micrófono",
-                            modifier = Modifier.size(25.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(10.dp))
-                    // BOTON DE OPCIONES
-                    Button(
-                        onClick = { /*TODO*/ }
-                    ) {
-                        Icon(
-                            Icons.Default.MoreVert,
-                            contentDescription = "Más opciones",
-                            modifier = Modifier.size(25.dp)
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
+            MultiMedia()
         }
 
         item {
@@ -444,3 +407,88 @@ fun AddEditNoteScreen(navController: NavController, navigationType: NotesAppNavi
     }
 }
 
+
+
+
+//Funcion para el apartado de multimedias
+@Composable
+fun MultiMedia(){
+    //Variables Multimedias
+    var imageUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+    val context = LocalContext.current
+    val bitmap = remember {
+        mutableStateOf<Bitmap?>(null)
+    }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent())
+    { uri: Uri? ->
+        imageUri = uri
+    }
+
+    imageUri?.let{
+        if(Build.VERSION.SDK_INT < 28){
+            bitmap.value = MediaStore.Images.
+            Media.getBitmap(context.contentResolver, it)
+        }else{
+            val source = ImageDecoder.createSource(context.contentResolver, it)
+            bitmap.value = ImageDecoder.decodeBitmap(source)
+        }
+
+        bitmap.value?.let{ btm ->
+            Image(
+                bitmap = btm.asImageBitmap(),
+                contentDescription = null,
+                modifier = Modifier.size(200.dp))
+        }
+    }
+    // BOTONES DE MULTIMEDIA
+    Column (
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(id = R.string.apartado_multimedia),
+            fontSize = 15.sp,
+            textAlign = TextAlign.Center
+        )
+        Row {
+            // BOTON DE GALERIA
+            Button(
+                onClick = { launcher.launch("image/*") }
+            ) {
+                Icon(
+                    Icons.Filled.Image,
+                    contentDescription = "Galería",
+                    modifier = Modifier.size(25.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            // BOTON DE GRABADORA
+            Button(
+                onClick = { /*TODO*/ }
+            ) {
+                Icon(
+                    Icons.Filled.Mic,
+                    contentDescription = "Micrófono",
+                    modifier = Modifier.size(25.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            // BOTON DE OPCIONES
+            Button(
+                onClick = { /*TODO*/ }
+            ) {
+                Icon(
+                    Icons.Default.MoreVert,
+                    contentDescription = "Más opciones",
+                    modifier = Modifier.size(25.dp)
+                )
+            }
+        }
+    }
+    Spacer(modifier = Modifier.height(16.dp))
+}

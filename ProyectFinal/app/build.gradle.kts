@@ -83,4 +83,10 @@ dependencies {
 
     // DISEÑO ADAPTABLE
     implementation("androidx.compose.material3:material3-window-size-class:1.0.1")
+
+    //Imagenes importar
+    implementation ("androidx.compose.ui:ui:1.0.0")
+    implementation ("androidx.activity:activity-compose:1.3.1")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
+    implementation ("androidx.compose.material:material:1.0.0")
 }
