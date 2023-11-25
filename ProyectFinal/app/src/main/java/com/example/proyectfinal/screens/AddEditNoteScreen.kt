@@ -49,14 +49,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Task
+import androidx.compose.material.icons.filled.VideoCall
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationBar
@@ -69,16 +74,27 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.example.proyectfinal.R
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
 import com.example.proyectfinal.data.dataNotas
+import com.example.proyectfinal.ui.theme.ComposeFileProvider
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ui.PlayerView
+import coil.compose.AsyncImage
+
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @Composable
@@ -413,43 +429,66 @@ fun AddEditNoteScreen(navController: NavController, navigationType: NotesAppNavi
 //Funcion para el apartado de multimedias
 @Composable
 fun MultiMedia(){
-    //Variables Multimedias
+
+    //VARIABLES MULTIMEDIA
+    // 1
+    var hasImage by remember {
+        mutableStateOf(false)
+    }
+    var hasVideo by remember {
+        mutableStateOf(false)
+    }
+    // 2
     var imageUri by remember {
         mutableStateOf<Uri?>(null)
     }
+
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            // TODO
+            // 3
+            hasImage = uri != null
+            imageUri = uri
+        }
+    )
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = { success ->
+            hasImage = success
+        }
+    )
+
+    val videoLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CaptureVideo(),
+        onResult = { success ->
+            hasVideo = success
+        }
+    )
+
     val context = LocalContext.current
-    val bitmap = remember {
-        mutableStateOf<Bitmap?>(null)
-    }
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent())
-    { uri: Uri? ->
-        imageUri = uri
-    }
-
-    imageUri?.let{
-        if(Build.VERSION.SDK_INT < 28){
-            bitmap.value = MediaStore.Images.
-            Media.getBitmap(context.contentResolver, it)
-        }else{
-            val source = ImageDecoder.createSource(context.contentResolver, it)
-            bitmap.value = ImageDecoder.decodeBitmap(source)
-        }
-
-        bitmap.value?.let{ btm ->
-            Image(
-                bitmap = btm.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier.size(200.dp))
-        }
-    }
+    //DISEÑO
     // BOTONES DE MULTIMEDIA
     Column (
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // 4
+        if ((hasImage or hasVideo) && imageUri != null) {
+            // 5
+            if(hasImage){
+                AsyncImage(
+                    model = imageUri,
+                    modifier = Modifier.size(300.dp),
+                    contentDescription = "Selected image",
+                )
+            }
+            if(hasVideo) {VideoPlayer(videoUri = imageUri!!)}
+        }
+
         Text(
             text = stringResource(id = R.string.apartado_multimedia),
             fontSize = 15.sp,
@@ -458,7 +497,7 @@ fun MultiMedia(){
         Row {
             // BOTON DE GALERIA
             Button(
-                onClick = { launcher.launch("image/*") }
+                onClick = { imagePicker.launch("image/*")  }
             ) {
                 Icon(
                     Icons.Filled.Image,
@@ -467,28 +506,81 @@ fun MultiMedia(){
                 )
             }
             Spacer(modifier = Modifier.width(10.dp))
-            // BOTON DE GRABADORA
+            // BOTON DE FOTO
+
             Button(
-                onClick = { /*TODO*/ }
+                onClick = {
+                    val uri = ComposeFileProvider.getImageUri(context)
+                    imageUri = uri
+                    cameraLauncher.launch(uri) },
             ) {
                 Icon(
-                    Icons.Filled.Mic,
-                    contentDescription = "Micrófono",
+                    Icons.Filled.CameraAlt,
+                    contentDescription = "Video",
                     modifier = Modifier.size(25.dp)
                 )
             }
             Spacer(modifier = Modifier.width(10.dp))
-            // BOTON DE OPCIONES
+            // BOTON DE VIDEO
             Button(
-                onClick = { /*TODO*/ }
+                onClick = {
+                    val uri = ComposeFileProvider.getImageUri(context)
+                    imageUri = uri
+                    videoLauncher.launch(uri) },
             ) {
                 Icon(
-                    Icons.Default.MoreVert,
-                    contentDescription = "Más opciones",
+                    Icons.Default.VideoCall,
+                    contentDescription = "Video",
                     modifier = Modifier.size(25.dp)
                 )
             }
         }
     }
     Spacer(modifier = Modifier.height(16.dp))
+}
+
+
+
+
+
+@Composable
+fun VideoPlayer(videoUri: Uri, modifier: Modifier = Modifier.fillMaxWidth()) {
+    val context = LocalContext.current
+    val exoPlayer = remember {
+        SimpleExoPlayer.Builder(context).build().apply {
+            setMediaItem(MediaItem.fromUri(videoUri))
+            prepare()
+        }
+    }
+    val playbackState = exoPlayer
+    val isPlaying = playbackState?.isPlaying ?: false
+
+    AndroidView(
+        factory = { context ->
+            PlayerView(context).apply {
+                player = exoPlayer
+            }
+        },
+        modifier = Modifier.fillMaxWidth(0.8f).height(200.dp),
+    )
+
+    IconButton(
+        onClick = {
+            if (isPlaying) {
+                exoPlayer.pause()
+            } else {
+                exoPlayer.play()
+            }
+        },
+        modifier = Modifier
+            //.align(Alignment.BottomEnd)
+            .padding(16.dp)
+    ) {
+        Icon(
+            imageVector = if (isPlaying) Icons.Filled.Refresh else Icons.Filled.PlayArrow,
+            contentDescription = if (isPlaying) "Pause" else "Play",
+            tint = Color.White,
+            modifier = Modifier.size(48.dp)
+        )
+    }
 }

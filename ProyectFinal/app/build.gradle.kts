@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.example.proyectfinal"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.proyectfinal"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -47,6 +47,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    buildToolsVersion = "34.0.0"
 }
 
 dependencies {
@@ -64,6 +65,7 @@ dependencies {
     implementation("androidx.compose.ui:ui:1.0.3")
     implementation("androidx.compose.material:material:1.0.3")
     implementation("androidx.compose.material3:material3:1.0.0")
+    implementation("androidx.media3:media3-ui:1.2.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -84,9 +86,11 @@ dependencies {
     // DISEÑO ADAPTABLE
     implementation("androidx.compose.material3:material3-window-size-class:1.0.1")
 
-    //Imagenes importar
-    implementation ("androidx.compose.ui:ui:1.0.0")
-    implementation ("androidx.activity:activity-compose:1.3.1")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
-    implementation ("androidx.compose.material:material:1.0.0")
+
+    // ExoPlayer
+    implementation("com.google.android.exoplayer:exoplayer:2.15.1")
+
+    // Coil. Para cargar imagenes de manera asyncrona
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
 }
