@@ -29,6 +29,9 @@ android {
             )
         }
     }
+
+
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -86,6 +89,8 @@ dependencies {
     // DISEÑO ADAPTABLE
     implementation("androidx.compose.material3:material3-window-size-class:1.0.1")
 
+    //PERMISOS
+    implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
 
     // ExoPlayer
     implementation("com.google.android.exoplayer:exoplayer:2.15.1")
