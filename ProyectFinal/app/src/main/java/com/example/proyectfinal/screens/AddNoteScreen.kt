@@ -39,14 +39,10 @@ import androidx.compose.ui.unit.sp
 import java.util.Calendar
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Task
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -60,25 +56,24 @@ import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.MutableState
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.proyectfinal.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
-import com.example.proyectfinal.data.dataNotas
+import com.example.proyectfinal.ui.NotesViewModel
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @Composable
-fun BodyContentAddEditNote(navController: NavController, navigationType: NotesAppNavigationType){
+fun BodyContentAddNote(notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
     Box(modifier = Modifier.fillMaxSize()){
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Content(navController, navigationType)
+            Content(notesViewModel, navController, navigationType)
         }
     }
 }
@@ -87,7 +82,7 @@ fun BodyContentAddEditNote(navController: NavController, navigationType: NotesAp
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Content(navController: NavController, navigationType: NotesAppNavigationType){
+private fun Content(notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
     //Variable de ViewModel
     val miViewModel = viewModel<MainViewModel>()
 
@@ -178,7 +173,7 @@ private fun Content(navController: NavController, navigationType: NotesAppNaviga
                             .fillMaxHeight()
                             .padding(start = 20.dp, top = 5.dp, end = 20.dp, bottom = 5.dp)
                     ){
-                        UI(miViewModel, navController)
+                        UI(notesViewModel, miViewModel, navController)
                     }
                 }
             }
@@ -193,7 +188,7 @@ private fun Content(navController: NavController, navigationType: NotesAppNaviga
                     .fillMaxHeight(0.92f)
                     .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 0.dp)
             ){
-                UI(miViewModel, navController)
+                UI(notesViewModel, miViewModel, navController)
             }
         }
         // CONTENIDO PARA PANTALLAS MEDIANAS
@@ -204,7 +199,7 @@ private fun Content(navController: NavController, navigationType: NotesAppNaviga
                     .fillMaxHeight(0.92f)
                     .padding(start = 80.dp, top = 80.dp, end = 20.dp, bottom = 20.dp)
             ){
-                UI(miViewModel, navController)
+                UI(notesViewModel, miViewModel, navController)
             }
         }
         // PARA PANTALLAS EXTENSAS, EL CONTENIDO SE INCLUYE CON EL NAVIGATION DRAWER
@@ -214,8 +209,9 @@ private fun Content(navController: NavController, navigationType: NotesAppNaviga
 
 
 @Composable
-private fun UI(miViewModel: MainViewModel, navController: NavController){
-
+private fun UI(notesViewModel: NotesViewModel, miViewModel: MainViewModel, navController: NavController){
+    val currentTitulo = remember { mutableStateOf("") }
+    val currentDescripcion = remember { mutableStateOf("") }
 
     LazyColumn(
         modifier = Modifier,
@@ -224,9 +220,9 @@ private fun UI(miViewModel: MainViewModel, navController: NavController){
         item{
             // CAJA DE TEXTO DE TITULO
             TextField(
-                value = miViewModel.title.value,
-                onValueChange = { newTitle ->
-                    miViewModel.setTitle(newTitle)
+                value = currentTitulo.value,
+                onValueChange = { value ->
+                    currentTitulo.value = value
                 },
                 label = { Text(stringResource(id = R.string.titulo)) },
                 placeholder = { Text(stringResource(id = R.string.agregar_titulo)) }
@@ -237,7 +233,7 @@ private fun UI(miViewModel: MainViewModel, navController: NavController){
         item {
             // COMBOBOX PARA ESCOGER NOTA O TAREA
             val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
-            ComboBox(options, stringResource(id = R.string.asunto),miViewModel)
+            ComboBox(options, stringResource(id = R.string.asunto), miViewModel)
             Spacer(modifier = Modifier.height(16.dp))
         }
 
@@ -300,9 +296,9 @@ private fun UI(miViewModel: MainViewModel, navController: NavController){
         item {
             // CAJA DE TEXTO PARA LA DESCRIPCI[ON
             TextField(
-                value = miViewModel.description.value,
-                onValueChange = { newDescription ->
-                    miViewModel.setDescription(newDescription)
+                value = currentDescripcion.value,
+                onValueChange = { value ->
+                    currentDescripcion.value = value
                 },
                 label = { Text(stringResource(id = R.string.descripcion)) },
                 placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) }
@@ -313,10 +309,15 @@ private fun UI(miViewModel: MainViewModel, navController: NavController){
         item {
             // BOTÓN GUARDAR Y CANCELAR
             Row {
-                val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
+                //val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
                 // BOTON DE GUARDAR
                 Button(
                     onClick = {
+                        notesViewModel.createNote(
+                            currentTitulo.value,
+                            currentDescripcion.value
+                        )
+                        navController.popBackStack()
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceTint,
@@ -438,9 +439,9 @@ fun ComboBox(items: List<String>, etiqueta: String, miViewModel: MainViewModel) 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun AddEditNoteScreen(navController: NavController, navigationType: NotesAppNavigationType){
+fun AddNoteScreen(notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
     Scaffold {
-        BodyContentAddEditNote(navController, navigationType)
+        BodyContentAddNote(notesViewModel, navController, navigationType)
     }
 }
 

@@ -53,25 +53,33 @@ import androidx.compose.ui.unit.sp
 import com.example.proyectfinal.navigation.AppNavigation
 import com.example.proyectfinal.ui.theme.ProyectFinalTheme
 import com.example.proyectfinal.screens.NotesScreen
+import com.example.proyectfinal.ui.NotesViewModel
+import com.example.proyectfinal.ui.NotesViewModelFactory
 
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var notesViewModel : NotesViewModel
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        notesViewModel = NotesViewModelFactory(NotesApp.getDao()).create(NotesViewModel::class.java)
+
         setContent {
             ProyectFinalTheme {
                 val windowSize = calculateWindowSizeClass(this)
                 Surface {
-                    AppNavigation(windowSize.widthSizeClass)
+                    AppNavigation(notesViewModel, windowSize.widthSizeClass)
                 }
             }
         }
     }
 }
 
-
+/*
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
@@ -82,3 +90,4 @@ fun DefaultPreview(){
         )
     }
 }
+ */

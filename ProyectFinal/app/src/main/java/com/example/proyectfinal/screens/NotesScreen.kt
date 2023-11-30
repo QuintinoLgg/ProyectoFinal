@@ -1,10 +1,12 @@
 package com.example.proyectfinal.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
@@ -60,22 +63,32 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.PermanentNavigationDrawer
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.Observer
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectfinal.Constants.orPlaceHolderList
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
 import com.example.proyectfinal.data.dataNotas
+import com.example.proyectfinal.models.Note
+import com.example.proyectfinal.ui.NotesViewModel
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
 
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @Composable
-fun BodyContentNotesScreen(navController: NavController, navigationType: NotesAppNavigationType){
+fun BodyContentNotesScreen(
+    notesViewModel: NotesViewModel,
+    navController: NavController,
+    navigationType: NotesAppNavigationType
+){
     Box(modifier = Modifier.fillMaxSize()){
         Column(
             modifier = Modifier,
@@ -83,7 +96,7 @@ fun BodyContentNotesScreen(navController: NavController, navigationType: NotesAp
                 //.background(colorResource(id = R.color.Secundario))
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Content(navController, navigationType)
+            Content(notesViewModel, navController, navigationType)
         }
 
     }
@@ -92,9 +105,15 @@ fun BodyContentNotesScreen(navController: NavController, navigationType: NotesAp
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Content(navController: NavController, navigationType: NotesAppNavigationType){
+private fun Content(
+    viewModel: NotesViewModel,
+    navController: NavController,
+    navigationType: NotesAppNavigationType
+){
     //Variable para el ViewModel
     val miViewModel = viewModel<MainViewModel>()
+    val notes = viewModel.notes.observeAsState()
+
     Scaffold (
         topBar = {
             var MyTitle = stringResource(id = R.string.notas)
@@ -182,15 +201,7 @@ private fun Content(navController: NavController, navigationType: NotesAppNaviga
                             .fillMaxHeight()
                             .padding(start = 20.dp, top = 5.dp, end = 20.dp, bottom = 5.dp)
                     ){
-                        LazyColumn(
-                            modifier = Modifier
-                                .padding(4.dp)
-                        ){
-                            items(dataNotas){
-                                Tarjeta(titulo = it.titulo, descripcion = it.descripcion)
-                            }
-
-                        }
+                        NotesList(notes = notes.value.orPlaceHolderList())
                     }
                 }
             }
@@ -205,15 +216,7 @@ private fun Content(navController: NavController, navigationType: NotesAppNaviga
                     .fillMaxHeight(0.92f)
                     .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 0.dp)
             ){
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(4.dp)
-                ){
-                    items(dataNotas){
-                        Tarjeta(titulo = it.titulo, descripcion = it.descripcion)
-                    }
-
-                }
+                NotesList(notes = notes.value.orPlaceHolderList())
             }
         }
         // CONTENIDO PARA PANTALLAS MEDIANAS
@@ -224,15 +227,7 @@ private fun Content(navController: NavController, navigationType: NotesAppNaviga
                     .fillMaxHeight(0.92f)
                     .padding(start = 80.dp, top = 80.dp, end = 20.dp, bottom = 20.dp)
             ){
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(4.dp)
-                ){
-                    items(dataNotas){
-                        Tarjeta(titulo = it.titulo, descripcion = it.descripcion)
-                    }
-
-                }
+                NotesList(notes = notes.value.orPlaceHolderList())
             }
         }
         // PARA PANTALLAS EXTENSAS, EL CONTENIDO SE INCLUYE CON EL NAVIGATION DRAWER
@@ -240,74 +235,20 @@ private fun Content(navController: NavController, navigationType: NotesAppNaviga
     }
 }
 
-/*
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-private fun MediumStyle(navController: NavController){
-
-    //Variable para el ViewModel
-    val miViewModel = viewModel<MainViewModel>()
-
-    Scaffold (
-        topBar = {
-            var MyTitle = stringResource(id = R.string.notas)
-            TopAppBar(
-                title = {
-                    Row(
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = MyTitle,
-                            modifier = Modifier.align(Alignment.CenterVertically)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
-        },
-        bottomBar = {
-            NavigationRail(
-                modifier = Modifier.padding(top = 80.dp)
-            ) {
-                var selectedItem by remember { mutableStateOf(0) }
-                bottomNavItems.forEachIndexed { index, item ->
-                    NavigationRailItem(
-                        selected = selectedItem == index,
-                        onClick = {
-                            selectedItem = index
-                            navController.navigate(item.ruta)
-                        },
-                        label = { Text(text = item.nombre) },
-                        icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
-                    )
-                }
-            }
-        }
+private fun NotesList(
+    notes: List<Note>
+){
+    LazyColumn(
+        contentPadding = PaddingValues(12.dp)
     ){
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(1f)
-                .fillMaxHeight(0.92f)
-                .padding(start = 80.dp, top = 80.dp, end = 20.dp, bottom = 20.dp)
-        ){
-            LazyColumn(
-                modifier = Modifier
-                    .padding(4.dp)
-            ){
-                items(dataNotas){
-                    Tarjeta(titulo = it.titulo, descripcion = it.descripcion)
-                }
-
-            }
+        itemsIndexed(notes){index, note ->
+            Tarjeta(titulo = note.titulo, descripcion = note.descripcion)
         }
     }
 }
-*/
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -411,9 +352,9 @@ private fun Tarjeta(titulo: String, descripcion: String){
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun NotesScreen(navController: NavController, navigationType: NotesAppNavigationType){
+fun NotesScreen(notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
     Scaffold {
-        BodyContentNotesScreen(navController, navigationType)
+        BodyContentNotesScreen(notesViewModel, navController, navigationType)
     }
 
 }

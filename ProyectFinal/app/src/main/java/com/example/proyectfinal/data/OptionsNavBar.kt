@@ -25,7 +25,7 @@ val bottomNavItems = listOf(
     ),
     BottomNavItem(
         nombre = "Agregar",
-        ruta = "add_edit_note_screen",
+        ruta = "add_note_screen",
         icono = Icons.Filled.Add,
     )
 )

@@ -69,12 +69,13 @@ import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
 import com.example.proyectfinal.data.dataNotas
 import com.example.proyectfinal.data.dataTareas
+import com.example.proyectfinal.ui.NotesViewModel
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
 
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @Composable
-fun BodyContentTasksScreen(navController: NavController, navigationType: NotesAppNavigationType){
+fun BodyContentTasksScreen(notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
     Box(modifier = Modifier.fillMaxSize()){
         Column(
             modifier = Modifier,
@@ -82,7 +83,7 @@ fun BodyContentTasksScreen(navController: NavController, navigationType: NotesAp
             //.background(colorResource(id = R.color.Secundario))
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Content(navController, navigationType)
+            Content(notesViewModel, navController, navigationType)
         }
 
     }
@@ -91,7 +92,7 @@ fun BodyContentTasksScreen(navController: NavController, navigationType: NotesAp
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Content(navController: NavController, navigationType: NotesAppNavigationType){
+private fun Content(notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
 
     //Variable para el ViewModel
     val miViewModel = viewModel<MainViewModel>()
@@ -187,9 +188,11 @@ private fun Content(navController: NavController, navigationType: NotesAppNaviga
                             modifier = Modifier
                                 .padding(4.dp)
                         ){
+                            /*
                             items(dataTareas){
                                 Tarjeta(titulo = it.titulo, descripcion = it.descripcion, it.fecha)
                             }
+                             */
 
                         }
                     }
@@ -211,9 +214,11 @@ private fun Content(navController: NavController, navigationType: NotesAppNaviga
                     modifier = Modifier
                         .padding(4.dp)
                 ){
+                    /*
                     items(dataTareas){
                         Tarjeta(titulo = it.titulo, descripcion = it.descripcion, it.fecha)
                     }
+                     */
 
                 }
             }
@@ -230,9 +235,11 @@ private fun Content(navController: NavController, navigationType: NotesAppNaviga
                     modifier = Modifier
                         .padding(4.dp)
                 ){
+                    /*
                     items(dataTareas){
                         Tarjeta(titulo = it.titulo, descripcion = it.descripcion, it.fecha)
                     }
+                     */
 
                 }
             }
@@ -351,8 +358,8 @@ private fun Tarjeta(titulo: String, descripcion: String, fecha: String){
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun TasksScreen(navController: NavController, navigationType: NotesAppNavigationType){
+fun TasksScreen(notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
     Scaffold {
-        BodyContentTasksScreen(navController, navigationType)
+        BodyContentTasksScreen(notesViewModel, navController, navigationType)
     }
 }

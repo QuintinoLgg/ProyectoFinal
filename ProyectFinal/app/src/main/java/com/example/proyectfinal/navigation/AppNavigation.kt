@@ -10,15 +10,17 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.proyectfinal.screens.AddEditNoteScreen
+import com.example.proyectfinal.screens.AddNoteScreen
 import com.example.proyectfinal.screens.NotesScreen
 import com.example.proyectfinal.screens.TasksScreen
+import com.example.proyectfinal.ui.NotesViewModel
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppNavigation(
+    notesViewModel: NotesViewModel,
     windowSize: WindowWidthSizeClass
 ){
     val navigationType: NotesAppNavigationType
@@ -44,13 +46,13 @@ fun AppNavigation(
         startDestination = AppScreens.NotesScreen.route
     ){
         composable(route = AppScreens.NotesScreen.route){
-            NotesScreen(navController, navigationType)
+            NotesScreen(notesViewModel, navController, navigationType)
         }
         composable(route = AppScreens.TasksScreen.route){
-            TasksScreen(navController, navigationType)
+            TasksScreen(notesViewModel, navController, navigationType)
         }
-        composable(route = AppScreens.AddEditNoteScreen.route){
-            AddEditNoteScreen(navController, navigationType)
+        composable(route = AppScreens.AddNoteScreen.route){
+            AddNoteScreen(notesViewModel, navController, navigationType)
         }
     }
 }
