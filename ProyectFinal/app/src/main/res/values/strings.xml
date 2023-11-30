@@ -10,7 +10,10 @@
     <string name="tarea">Tarea</string>
     <string name="nota">Nota</string>
     <string name="notas_tareas">Notas / Tareas</string>
-    <string name="agregar">Agregar</string>
+    <string name="agregar_nota">Agregar Nota</string>
+    <string name="editar_nota">Editar Nota</string>
+    <string name="agregar_tarea">Agregar Tarea</string>
+    <string name="editar_tarea">Editar Tarea</string>
     <string name="todos">Todos</string>
     <string name="hoy">Hoy</string>
     <string name="semana">Semana</string>

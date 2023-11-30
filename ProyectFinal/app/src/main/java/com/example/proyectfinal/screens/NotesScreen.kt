@@ -364,28 +364,6 @@ private fun Tarjeta(
             DropdownMenuItem(
                 onClick = {
                     showMenuAffair = !showMenuAffair
-                }) {
-                Icon(
-                    imageVector = Icons.Filled.Handshake,
-                    contentDescription = "Terminado"
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(text = stringResource(id = R.string.terminado))
-            }
-            DropdownMenuItem(
-                onClick = {
-                    showMenuAffair = !showMenuAffair
-                }) {
-                Icon(
-                    imageVector = Icons.Filled.Star,
-                    contentDescription = "Destacar"
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(text = stringResource(id = R.string.destacado))
-            }
-            DropdownMenuItem(
-                onClick = {
-                    showMenuAffair = !showMenuAffair
                     // ACCI[ON DE EDITAR
                     Constants.NOTA_EDITAR = note.id?:0
                     navController.navigate(AppScreens.EditNoteScreen.route)
@@ -429,11 +407,11 @@ private fun DeleteDialog(
                 openDialog.value = false
             },
             title = {
-                androidx.compose.material.Text(text = "Borrar nota?")
+                Text(text = "Borrar nota?")
             },
             text = {
                 Column() {
-                    androidx.compose.material.Text("Vamos a eliminar esta madre?")
+                    Text("Vamos a eliminar esta madre?")
                 }
             },
             buttons = {
@@ -445,8 +423,8 @@ private fun DeleteDialog(
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color.Black,
-                                contentColor = Color.White
+                                backgroundColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
                             onClick = {
                                 action.invoke()
@@ -454,21 +432,21 @@ private fun DeleteDialog(
                                 notesToDelete.value = mutableListOf()
                             }
                         ) {
-                            androidx.compose.material.Text("Simon")
+                            Text("Simon")
                         }
                         Spacer(modifier = Modifier.padding(12.dp))
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color.Black,
-                                contentColor = Color.White
+                                backgroundColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
                             onClick = {
                                 openDialog.value = false
                                 notesToDelete.value = mutableListOf()
                             }
                         ) {
-                            androidx.compose.material.Text("No")
+                            Text("No")
                         }
                     }
 

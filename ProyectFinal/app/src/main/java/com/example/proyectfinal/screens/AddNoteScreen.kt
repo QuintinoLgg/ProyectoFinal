@@ -88,7 +88,7 @@ private fun Content(notesViewModel: NotesViewModel, navController: NavController
 
     Scaffold (
         topBar = {
-            var MyTitle = stringResource(id = R.string.agregar)
+            var MyTitle = stringResource(id = R.string.agregar_nota)
             TopAppBar(
                 title = {
                     Row(
@@ -225,7 +225,8 @@ private fun UI(notesViewModel: NotesViewModel, miViewModel: MainViewModel, navCo
                     currentTitulo.value = value
                 },
                 label = { Text(stringResource(id = R.string.titulo)) },
-                placeholder = { Text(stringResource(id = R.string.agregar_titulo)) }
+                placeholder = { Text(stringResource(id = R.string.agregar_titulo)) },
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -302,7 +303,8 @@ private fun UI(notesViewModel: NotesViewModel, miViewModel: MainViewModel, navCo
                     currentDescripcion.value = value
                 },
                 label = { Text(stringResource(id = R.string.descripcion)) },
-                placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) }
+                placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) },
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(30.dp))
         }
@@ -411,10 +413,11 @@ fun ComboBox(items: List<String>, etiqueta: String, miViewModel: MainViewModel) 
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = {expanded = !expanded}
+        onExpandedChange = {expanded = !expanded},
+        modifier = Modifier.fillMaxWidth()
     ) {
         TextField(
-            modifier = Modifier.menuAnchor(),
+            modifier = Modifier.menuAnchor().fillMaxWidth(),
             readOnly = true,
             value = miViewModel.subject.value,
             onValueChange = {},
@@ -423,7 +426,8 @@ fun ComboBox(items: List<String>, etiqueta: String, miViewModel: MainViewModel) 
         )
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
         ) {
             items.forEach { item ->
                 DropdownMenuItem(
@@ -432,7 +436,8 @@ fun ComboBox(items: List<String>, etiqueta: String, miViewModel: MainViewModel) 
                         miViewModel.subject.value = item
                         expanded = false
                     },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }

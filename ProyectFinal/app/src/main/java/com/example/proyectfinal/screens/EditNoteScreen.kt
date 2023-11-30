@@ -95,7 +95,7 @@ private fun Content(noteId: Int, notesViewModel: NotesViewModel, navController: 
 
     Scaffold (
         topBar = {
-            var MyTitle = stringResource(id = R.string.agregar)
+            var MyTitle = stringResource(id = R.string.editar_nota)
             TopAppBar(
                 title = {
                     Row(
