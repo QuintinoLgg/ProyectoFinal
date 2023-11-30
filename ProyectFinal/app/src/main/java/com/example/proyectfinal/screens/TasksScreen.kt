@@ -192,6 +192,7 @@ private fun Content(notesViewModel: NotesViewModel, navController: NavController
                             items(dataTareas){
                                 Tarjeta(titulo = it.titulo, descripcion = it.descripcion, it.fecha)
                             }
+
                              */
 
                         }

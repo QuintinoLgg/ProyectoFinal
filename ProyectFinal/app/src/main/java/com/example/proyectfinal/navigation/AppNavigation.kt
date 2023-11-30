@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.proyectfinal.screens.AddNoteScreen
+import com.example.proyectfinal.screens.EditNoteScreen
 import com.example.proyectfinal.screens.NotesScreen
 import com.example.proyectfinal.screens.TasksScreen
 import com.example.proyectfinal.ui.NotesViewModel
@@ -53,6 +54,9 @@ fun AppNavigation(
         }
         composable(route = AppScreens.AddNoteScreen.route){
             AddNoteScreen(notesViewModel, navController, navigationType)
+        }
+        composable(route = AppScreens.EditNoteScreen.route){
+            EditNoteScreen(notesViewModel, navController, navigationType)
         }
     }
 }

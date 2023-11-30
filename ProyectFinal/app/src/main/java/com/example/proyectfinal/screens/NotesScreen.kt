@@ -19,6 +19,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
@@ -73,11 +76,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import com.example.proyectfinal.Constants
 import com.example.proyectfinal.Constants.orPlaceHolderList
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
 import com.example.proyectfinal.data.dataNotas
 import com.example.proyectfinal.models.Note
+import com.example.proyectfinal.navigation.AppScreens
 import com.example.proyectfinal.ui.NotesViewModel
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
 
@@ -113,6 +120,8 @@ private fun Content(
     //Variable para el ViewModel
     val miViewModel = viewModel<MainViewModel>()
     val notes = viewModel.notes.observeAsState()
+    val notesToDelete = remember { mutableStateOf(listOf<Note>()) }
+    val openDialog = remember { mutableStateOf(false) }
 
     Scaffold (
         topBar = {
@@ -201,7 +210,22 @@ private fun Content(
                             .fillMaxHeight()
                             .padding(start = 20.dp, top = 5.dp, end = 20.dp, bottom = 5.dp)
                     ){
-                        NotesList(notes = notes.value.orPlaceHolderList())
+                        NotesList(
+                            notes = notes.value.orPlaceHolderList(),
+                            notesToDelete = notesToDelete,
+                            openDialog = openDialog,
+                            navController = navController
+                        )
+
+                        DeleteDialog(
+                            openDialog = openDialog,
+                            notesToDelete = notesToDelete,
+                            action = {
+                                notesToDelete.value.forEach{
+                                    viewModel.deleteNotes(it)
+                                }
+                            }
+                        )
                     }
                 }
             }
@@ -216,7 +240,22 @@ private fun Content(
                     .fillMaxHeight(0.92f)
                     .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 0.dp)
             ){
-                NotesList(notes = notes.value.orPlaceHolderList())
+                NotesList(
+                    notes = notes.value.orPlaceHolderList(),
+                    notesToDelete = notesToDelete,
+                    openDialog = openDialog,
+                    navController = navController
+                )
+
+                DeleteDialog(
+                    openDialog = openDialog,
+                    notesToDelete = notesToDelete,
+                    action = {
+                        notesToDelete.value.forEach{
+                            viewModel.deleteNotes(it)
+                        }
+                    }
+                )
             }
         }
         // CONTENIDO PARA PANTALLAS MEDIANAS
@@ -227,7 +266,22 @@ private fun Content(
                     .fillMaxHeight(0.92f)
                     .padding(start = 80.dp, top = 80.dp, end = 20.dp, bottom = 20.dp)
             ){
-                NotesList(notes = notes.value.orPlaceHolderList())
+                NotesList(
+                    notes = notes.value.orPlaceHolderList(),
+                    notesToDelete = notesToDelete,
+                    openDialog = openDialog,
+                    navController = navController
+                )
+
+                DeleteDialog(
+                    openDialog = openDialog,
+                    notesToDelete = notesToDelete,
+                    action = {
+                        notesToDelete.value.forEach{
+                            viewModel.deleteNotes(it)
+                        }
+                    }
+                )
             }
         }
         // PARA PANTALLAS EXTENSAS, EL CONTENIDO SE INCLUYE CON EL NAVIGATION DRAWER
@@ -238,13 +292,16 @@ private fun Content(
 
 @Composable
 private fun NotesList(
-    notes: List<Note>
+    notes: List<Note>,
+    openDialog: MutableState<Boolean>,
+    notesToDelete: MutableState<List<Note>>,
+    navController: NavController
 ){
     LazyColumn(
         contentPadding = PaddingValues(12.dp)
     ){
         itemsIndexed(notes){index, note ->
-            Tarjeta(titulo = note.titulo, descripcion = note.descripcion)
+            Tarjeta(note, notesToDelete, openDialog, navController)
         }
     }
 }
@@ -252,7 +309,12 @@ private fun NotesList(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Tarjeta(titulo: String, descripcion: String){
+private fun Tarjeta(
+    note: Note,
+    notesToDelete: MutableState<List<Note>>,
+    openDialog: MutableState<Boolean>,
+    navController: NavController
+){
     var showMenuAffair by  remember{ mutableStateOf(false) }
 
     val context = LocalContext.current
@@ -266,14 +328,14 @@ private fun Tarjeta(titulo: String, descripcion: String){
         ,
         onClick = {
             showMenuAffair = !showMenuAffair
-        }
+        },
     ) {
         Column (
             modifier = Modifier
                 .padding(start = 10.dp, top = 4.dp, bottom = 8.dp)
         ) {
             Text(
-                text = titulo,
+                text = note.titulo,
                 modifier = Modifier
                     .padding(top = 6.dp),
                 textAlign = TextAlign.Center,
@@ -281,7 +343,7 @@ private fun Tarjeta(titulo: String, descripcion: String){
                 fontSize = 25.sp
             )
             Text(
-                text = descripcion,
+                text = note.descripcion,
                 modifier = Modifier
                     .padding(2.dp),
                 textAlign = TextAlign.Center
@@ -324,6 +386,9 @@ private fun Tarjeta(titulo: String, descripcion: String){
             DropdownMenuItem(
                 onClick = {
                     showMenuAffair = !showMenuAffair
+                    // ACCI[ON DE EDITAR
+                    Constants.NOTA_EDITAR = note.id?:0
+                    navController.navigate(AppScreens.EditNoteScreen.route)
                 }) {
                 Icon(
                     imageVector = Icons.Filled.Edit,
@@ -335,6 +400,8 @@ private fun Tarjeta(titulo: String, descripcion: String){
             DropdownMenuItem(
                 onClick = {
                     showMenuAffair = !showMenuAffair
+                    openDialog.value = true
+                    notesToDelete.value = mutableListOf(note)
                 }) {
                 Icon(
                     imageVector = Icons.Filled.Delete,
@@ -348,6 +415,69 @@ private fun Tarjeta(titulo: String, descripcion: String){
     }
     Spacer(modifier = Modifier.height(15.dp))
 }
+
+
+@Composable
+private fun DeleteDialog(
+    openDialog: MutableState<Boolean>,
+    action: () -> Unit,
+    notesToDelete: MutableState<List<Note>>
+) {
+    if (openDialog.value) {
+        AlertDialog(
+            onDismissRequest = {
+                openDialog.value = false
+            },
+            title = {
+                androidx.compose.material.Text(text = "Borrar nota?")
+            },
+            text = {
+                Column() {
+                    androidx.compose.material.Text("Vamos a eliminar esta madre?")
+                }
+            },
+            buttons = {
+                Row(
+                    modifier = Modifier.padding(all = 8.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Column() {
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Color.Black,
+                                contentColor = Color.White
+                            ),
+                            onClick = {
+                                action.invoke()
+                                openDialog.value = false
+                                notesToDelete.value = mutableListOf()
+                            }
+                        ) {
+                            androidx.compose.material.Text("Simon")
+                        }
+                        Spacer(modifier = Modifier.padding(12.dp))
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Color.Black,
+                                contentColor = Color.White
+                            ),
+                            onClick = {
+                                openDialog.value = false
+                                notesToDelete.value = mutableListOf()
+                            }
+                        ) {
+                            androidx.compose.material.Text("No")
+                        }
+                    }
+
+                }
+            }
+        )
+    }
+}
+
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

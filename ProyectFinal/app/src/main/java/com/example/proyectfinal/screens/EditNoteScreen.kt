@@ -56,24 +56,31 @@ import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.proyectfinal.R
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectfinal.Constants
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
+import com.example.proyectfinal.models.Note
 import com.example.proyectfinal.ui.NotesViewModel
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @Composable
-fun BodyContentAddNote(notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
+fun BodyContentEditNote(notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
     Box(modifier = Modifier.fillMaxSize()){
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Content(notesViewModel, navController, navigationType)
+            val noteId = Constants.NOTA_EDITAR
+            Content(noteId, notesViewModel, navController, navigationType)
         }
     }
 }
@@ -82,7 +89,7 @@ fun BodyContentAddNote(notesViewModel: NotesViewModel, navController: NavControl
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Content(notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
+private fun Content(noteId: Int, notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
     //Variable de ViewModel
     val miViewModel = viewModel<MainViewModel>()
 
@@ -173,7 +180,7 @@ private fun Content(notesViewModel: NotesViewModel, navController: NavController
                             .fillMaxHeight()
                             .padding(start = 20.dp, top = 5.dp, end = 20.dp, bottom = 5.dp)
                     ){
-                        UI(notesViewModel, miViewModel, navController)
+                        UI(noteId, notesViewModel, miViewModel, navController)
                     }
                 }
             }
@@ -188,7 +195,7 @@ private fun Content(notesViewModel: NotesViewModel, navController: NavController
                     .fillMaxHeight(0.92f)
                     .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 0.dp)
             ){
-                UI(notesViewModel, miViewModel, navController)
+                UI(noteId, notesViewModel, miViewModel, navController)
             }
         }
         // CONTENIDO PARA PANTALLAS MEDIANAS
@@ -199,7 +206,7 @@ private fun Content(notesViewModel: NotesViewModel, navController: NavController
                     .fillMaxHeight(0.92f)
                     .padding(start = 80.dp, top = 80.dp, end = 20.dp, bottom = 20.dp)
             ){
-                UI(notesViewModel, miViewModel, navController)
+                UI(noteId, notesViewModel, miViewModel, navController)
             }
         }
         // PARA PANTALLAS EXTENSAS, EL CONTENIDO SE INCLUYE CON EL NAVIGATION DRAWER
@@ -209,9 +216,22 @@ private fun Content(notesViewModel: NotesViewModel, navController: NavController
 
 
 @Composable
-private fun UI(notesViewModel: NotesViewModel, miViewModel: MainViewModel, navController: NavController){
+private fun UI(noteId: Int, notesViewModel: NotesViewModel, miViewModel: MainViewModel, navController: NavController){
+    val scope = rememberCoroutineScope()
+    val note = remember {
+        mutableStateOf(Note(0,"",""))
+    }
+
     val currentTitulo = remember { mutableStateOf("") }
     val currentDescripcion = remember { mutableStateOf("") }
+
+    LaunchedEffect(true){
+        scope.launch(Dispatchers.IO){
+            note.value = notesViewModel.getNote(noteId) ?: Note(0,"N/D","N/D")
+            currentTitulo.value = note.value.titulo
+            currentDescripcion.value = note.value.descripcion
+        }
+    }
 
     LazyColumn(
         modifier = Modifier,
@@ -229,20 +249,6 @@ private fun UI(notesViewModel: NotesViewModel, miViewModel: MainViewModel, navCo
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
-
-        item {
-            // COMBOBOX PARA ESCOGER NOTA O TAREA
-            val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
-            ComboBox(options, stringResource(id = R.string.asunto), miViewModel)
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        /*
-        item {
-            // DATETIMEPICKER PARA SELECCIONAR LA FECHA DE LA NOTA
-            DatePicker(miViewModel)
-            Spacer(modifier = Modifier.height(16.dp))
-        }*/
 
         item {
             // BOTONES DE MULTIMEDIA
@@ -314,9 +320,12 @@ private fun UI(notesViewModel: NotesViewModel, miViewModel: MainViewModel, navCo
                 // BOTON DE GUARDAR
                 Button(
                     onClick = {
-                        notesViewModel.createNote(
-                            currentTitulo.value,
-                            currentDescripcion.value
+                        notesViewModel.updateNote(
+                            Note(
+                                note.value.id,
+                                currentTitulo.value,
+                                currentDescripcion.value
+                            )
                         )
                         navController.popBackStack()
                     },
@@ -357,93 +366,10 @@ private fun UI(notesViewModel: NotesViewModel, miViewModel: MainViewModel, navCo
 }
 
 
-
-
-// DATETIME PICKER PERSONALIZADO
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePicker(miViewModel: MainViewModel){
-    var fecha by rememberSaveable {
-        mutableStateOf("")
-    }
-    val year: Int
-    val month: Int
-    val day: Int
-    val nCalendar = Calendar.getInstance()
-    year = nCalendar.get(Calendar.YEAR)
-    month = nCalendar.get(Calendar.MONTH)
-    day = nCalendar.get(Calendar.DAY_OF_MONTH)
-
-    val nDatePickerDialog = DatePickerDialog(
-        LocalContext.current,
-        { _, year: Int, month: Int, day: Int ->
-            fecha = "$day/$month/$year"
-            miViewModel.setdate(fecha) // Aquí establece la fecha en el ViewModel
-        },
-        year, month, day
-    )
-
-    TextField(
-        value = miViewModel.date.value,
-        onValueChange = { newDate ->
-            miViewModel.setdate(newDate)
-        },
-        readOnly = true,
-        label = { Text(stringResource(id = R.string.fecha)) },
-        placeholder = { Text(stringResource(id = R.string.selecciona_fecha)) },
-        leadingIcon = {
-            Icon(
-                Icons.Default.DateRange,
-                contentDescription = null,
-                modifier = Modifier.clickable { nDatePickerDialog.show() }
-            )
-        }
-    )
-}
-
-
-// COMBOBOX PERSONALIZADO
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ComboBox(items: List<String>, etiqueta: String, miViewModel: MainViewModel) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf(items[0]) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = {expanded = !expanded}
-    ) {
-        TextField(
-            modifier = Modifier.menuAnchor(),
-            readOnly = true,
-            value = miViewModel.subject.value,
-            onValueChange = {},
-            label = { Text(etiqueta) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            items.forEach { item ->
-                DropdownMenuItem(
-                    text = { Text(text = item) },
-                    onClick = {
-                        miViewModel.subject.value = item
-                        expanded = false
-                    },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-                )
-            }
-        }
-    }
-}
-
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun AddNoteScreen(notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
+fun EditNoteScreen(notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
     Scaffold {
-        BodyContentAddNote(notesViewModel, navController, navigationType)
+        BodyContentEditNote(notesViewModel, navController, navigationType)
     }
 }
-
