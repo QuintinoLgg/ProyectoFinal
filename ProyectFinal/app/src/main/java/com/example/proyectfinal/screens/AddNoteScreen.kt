@@ -400,6 +400,7 @@ fun DatePicker(miViewModel: MainViewModel){
     )
 }
 
+
 // COMBOBOX PERSONALIZADO
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
