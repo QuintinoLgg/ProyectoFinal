@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,6 +57,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -65,6 +67,7 @@ import androidx.navigation.NavController
 import com.example.proyectfinal.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import coil.compose.rememberImagePainter
 import com.example.proyectfinal.Constants
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
@@ -163,12 +166,14 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
 
     val currentTitulo = remember { mutableStateOf("") }
     val currentDescripcion = remember { mutableStateOf("") }
+    val currentFoto = remember { mutableStateOf("") }
     val note = Constants.General.nota
 
     LaunchedEffect(true){
         scope.launch(Dispatchers.IO){
             currentTitulo.value = note.titulo
             currentDescripcion.value = note.descripcion
+            currentFoto.value = note.imageUri
         }
     }
 
@@ -205,9 +210,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
         }
 
         item {
-
-
-            Multimedia()
+            Multimedia(currentFoto)
         }
 
         item {
@@ -221,7 +224,8 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                             Note(
                                 id = note.id,
                                 titulo = currentTitulo.value,
-                                descripcion = currentDescripcion.value
+                                descripcion = currentDescripcion.value,
+                                imageUri = currentFoto.value
                             )
                         )
                         navController.popBackStack()
@@ -258,6 +262,19 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                 }
             }
         }
+
+        item{
+            // Mostrar la imagen seleccionada
+            if (currentFoto.value.isNotEmpty()) {
+                Image(
+                    painter = rememberImagePainter(data = currentFoto.value),
+                    contentDescription = "Selected Image",
+                    modifier = Modifier
+                        .size(200.dp)
+                        .padding(16.dp)
+                )
+            }
+        }
     }
 }
 
@@ -272,18 +289,21 @@ fun EditNoteScreen(viewModel: miViewModel, navController: NavController, navigat
 }
 
 @Composable
-fun Multimedia(){
+fun Multimedia(ruta: MutableState<String>){
     //VARIABLES
     // 1
     var hasImage by remember {
-        mutableStateOf(false)
+        mutableStateOf(
+            if(ruta.value == "") false
+            else true
+        )
     }
     var hasVideo by remember {
         mutableStateOf(false)
     }
     // 2
     var imageUri by remember {
-        mutableStateOf<Uri?>(null)
+        mutableStateOf(ruta.value)
     }
 
     val imagePicker = rememberLauncherForActivityResult(
@@ -292,7 +312,8 @@ fun Multimedia(){
             // TODO
             // 3
             hasImage = uri != null
-            imageUri = uri
+            imageUri = uri.toString()
+            ruta.value = uri.toString()
         }
     )
 
@@ -319,17 +340,18 @@ fun Multimedia(){
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         // 4
-        if ((hasImage or hasVideo) && imageUri != null) {
+        if ((hasImage or hasVideo) && imageUri != "") {
             // 5
             if(hasImage){
                 AsyncImage(
-                    model = imageUri,
+                    model = Uri.parse(imageUri),
                     modifier = Modifier.size(300.dp),
                     contentDescription = "Selected image",
                 )
             }
-            if(hasVideo) {VideoPlayer(videoUri = imageUri!!)}
+            // if(hasVideo) {VideoPlayer(videoUri = imageUri!!.toString())}
         }
 
         Text(
@@ -354,7 +376,7 @@ fun Multimedia(){
             Button(
                 onClick = {
                     val uri = ComposeFileProvider.getImageUri(context)
-                    imageUri = uri
+                    imageUri = uri.toString()
                     cameraLauncher.launch(uri) },
             ) {
                 Icon(
@@ -368,7 +390,7 @@ fun Multimedia(){
             Button(
                 onClick = {
                     val uri = ComposeFileProvider.getImageUri(context)
-                    imageUri = uri
+                    imageUri = uri.toString()
                     videoLauncher.launch(uri) },
             ) {
                 Icon(
@@ -400,7 +422,9 @@ fun VideoPlayer(videoUri: Uri, modifier: Modifier = Modifier.fillMaxWidth()) {
                 player = exoPlayer
             }
         },
-        modifier = Modifier.fillMaxWidth(0.8f).height(200.dp),
+        modifier = Modifier
+            .fillMaxWidth(0.8f)
+            .height(200.dp),
     )
 
     IconButton(

@@ -25,5 +25,12 @@ class MainViewModel() : ViewModel() {
     fun setDescription(newDescription: String) {
         description.value = newDescription
     }
+
+
+    var destiny: MutableState<Double> = mutableStateOf(0.0)
+    fun setdestiny(newdestiny: Double) {
+        destiny.value = newdestiny
+    }
+
 }
 

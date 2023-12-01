@@ -182,7 +182,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
         }
 
         item {
-            Multimedia()
+            //Multimedia()
         }
 
         item {

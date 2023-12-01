@@ -18,5 +18,6 @@ data class Task(
 data class Note(
     @PrimaryKey(autoGenerate = true) var id: Int,
     @ColumnInfo(name = "titulo") val titulo: String,
-    @ColumnInfo(name = "descripcion") val descripcion: String
+    @ColumnInfo(name = "descripcion") val descripcion: String,
+    @ColumnInfo(name = "uri") val imageUri: String
 )

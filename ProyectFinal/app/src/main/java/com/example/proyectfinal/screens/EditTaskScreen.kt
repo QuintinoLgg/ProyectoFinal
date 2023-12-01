@@ -221,7 +221,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
         }
 
         item {
-            Multimedia()
+            //Multimedia()
         }
 
         item {
@@ -276,6 +276,9 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
     }
 }
 
+
+
+
 // DATETIME PICKER PERSONALIZADO
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -293,6 +296,11 @@ private fun DatePicker(
     year = nCalendar.get(Calendar.YEAR)
     month = nCalendar.get(Calendar.MONTH)
     day = nCalendar.get(Calendar.DAY_OF_MONTH)
+
+    //VARIABLE para notificaciones programadas de una tarea
+    miViewModel.setdestiny((year * 365.25 * 24 * 60 * 60 * 1000)
+            + (month * 30.44 * 24 * 60 * 60 * 1000)
+            + (day * 60 * 1000))
 
     val nDatePickerDialog = DatePickerDialog(
         LocalContext.current,
