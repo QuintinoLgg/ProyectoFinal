@@ -60,6 +60,7 @@ class miViewModel(
     fun deleteNote(note: Note){
         viewModelScope.launch(Dispatchers.IO){
             db.NotesDao().deleteNote(note)
+            renderizado()
         }
     }
 
@@ -94,6 +95,7 @@ class miViewModel(
     fun getAllTasks(){
         viewModelScope.launch(Dispatchers.IO){
             db.TaskDao().getTasks()
+            renderizado()
         }
     }
 }

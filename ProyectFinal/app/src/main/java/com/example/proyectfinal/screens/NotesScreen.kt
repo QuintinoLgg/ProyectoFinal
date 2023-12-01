@@ -192,7 +192,8 @@ private fun Content(
                         NotesList(
                             notes = notes,
                             openDialog = openDialog,
-                            navController = navController
+                            navController = navController,
+                            viewModel = viewModel
                         )
 
                     }
@@ -212,7 +213,8 @@ private fun Content(
                 NotesList(
                     notes = notes,
                     openDialog = openDialog,
-                    navController = navController
+                    navController = navController,
+                    viewModel = viewModel
                 )
 
             }
@@ -228,7 +230,8 @@ private fun Content(
                 NotesList(
                     notes = notes,
                     openDialog = openDialog,
-                    navController = navController
+                    navController = navController,
+                    viewModel = viewModel
                 )
 
             }
@@ -243,13 +246,14 @@ private fun Content(
 private fun NotesList(
     notes: List<Note>,
     openDialog: MutableState<Boolean>,
-    navController: NavController
+    navController: NavController,
+    viewModel: miViewModel
 ){
     LazyColumn(
         contentPadding = PaddingValues(12.dp)
     ){
         itemsIndexed(notes){index, note ->
-            Tarjeta(note, openDialog, navController)
+            Tarjeta(note, openDialog, navController, viewModel)
         }
     }
 }
@@ -260,7 +264,8 @@ private fun NotesList(
 private fun Tarjeta(
     note: Note,
     openDialog: MutableState<Boolean>,
-    navController: NavController
+    navController: NavController,
+    viewModel: miViewModel
 ){
     var showMenuAffair by  remember{ mutableStateOf(false) }
 
@@ -312,6 +317,7 @@ private fun Tarjeta(
                 onClick = {
                     showMenuAffair = !showMenuAffair
                     navController.navigate(AppScreens.EditNoteScreen.route)
+                    Constants.General.nota = note
                 }) {
                 Icon(
                     imageVector = Icons.Filled.Edit,
@@ -324,6 +330,7 @@ private fun Tarjeta(
                 onClick = {
                     showMenuAffair = !showMenuAffair
                     openDialog.value = true
+
                 }) {
                 Icon(
                     imageVector = Icons.Filled.Delete,
@@ -335,15 +342,16 @@ private fun Tarjeta(
 
         }
     }
+    DeleteDialog(note, openDialog, viewModel)
     Spacer(modifier = Modifier.height(15.dp))
 }
 
 
 @Composable
 private fun DeleteDialog(
+    note: Note,
     openDialog: MutableState<Boolean>,
-    action: () -> Unit,
-    notesToDelete: MutableState<List<Note>>
+    viewModel: miViewModel
 ) {
     if (openDialog.value) {
         AlertDialog(
@@ -371,9 +379,7 @@ private fun DeleteDialog(
                                 contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
                             onClick = {
-                                action.invoke()
-                                openDialog.value = false
-                                notesToDelete.value = mutableListOf()
+                                viewModel.deleteNote(note)
                             }
                         ) {
                             Text("Simon")
@@ -387,7 +393,6 @@ private fun DeleteDialog(
                             ),
                             onClick = {
                                 openDialog.value = false
-                                notesToDelete.value = mutableListOf()
                             }
                         ) {
                             Text("No")

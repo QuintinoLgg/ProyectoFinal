@@ -16,7 +16,7 @@ data class Task(
 
 @Entity(tableName = Constants.NotesTable.NAME)
 data class Note(
-    @PrimaryKey(autoGenerate = true) val id: Int? = null,
+    @PrimaryKey(autoGenerate = true) var id: Int? = null,
     @ColumnInfo(name = "titulo") val titulo: String,
     @ColumnInfo(name = "descripcion") val descripcion: String
 )

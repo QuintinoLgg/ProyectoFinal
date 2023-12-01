@@ -1,9 +1,14 @@
 package com.example.proyectfinal
 
+import com.example.proyectfinal.models.Note
+
 class Constants {
+
     object General {
         const val NAME = "AppDatabase"
+        var nota = Note(0,"","")
     }
+
 
     object NotesTable {
         const val NAME = "notes"
