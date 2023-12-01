@@ -87,7 +87,7 @@ class miViewModel(
 
     fun deleteTask(task: Task){
         viewModelScope.launch(Dispatchers.IO){
-            db.TaskDao().updateTask(task)
+            db.TaskDao().deleteTask(task)
             renderizado()
         }
     }

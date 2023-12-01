@@ -12,16 +12,16 @@ import com.example.proyectfinal.models.Task
 @Dao
 interface NotesDao {
     @Query("SELECT * FROM Notes WHERE Notes.id=:id")
-    suspend fun getNoteById(id: Int) : Note?
+    fun getNoteById(id: Int) : Note
 
     @Query("SELECT * FROM Notes")
     fun getNotes() : List<Note>
 
     @Delete
-    fun deleteNote(note: Note) : Int
+    fun deleteNote(note: Note)
 
     @Update
-    fun updateNote(note: Note) : Int
+    fun updateNote(note: Note)
 
     @Insert
     fun insertNote(note: Note)
@@ -31,16 +31,16 @@ interface NotesDao {
 @Dao
 interface TaskDao {
     @Query("SELECT * FROM Tasks WHERE Tasks.id=:id")
-    suspend fun getTaskById(id: Int) : Task?
+    fun getTaskById(id: Int) : Task
 
     @Query("SELECT * FROM Tasks")
     fun getTasks() : List<Task>
 
     @Delete
-    fun deleteTask(task: Task) : Int
+    fun deleteTask(task: Task)
 
     @Update
-    fun updateTask(task: Task) : Int
+    fun updateTask(task: Task)
 
     @Insert
     fun insertTask(task: Task)

@@ -1,10 +1,12 @@
 package com.example.proyectfinal.screens
 
+
 import android.annotation.SuppressLint
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -14,8 +16,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -37,11 +42,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectfinal.R
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Handshake
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -49,20 +57,31 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.PermanentNavigationDrawer
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectfinal.Constants
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
+import com.example.proyectfinal.models.Note
+import com.example.proyectfinal.models.Task
+import com.example.proyectfinal.navigation.AppScreens
 import com.example.proyectfinal.ui.miViewModel
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
 
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @Composable
-fun BodyContentTasksScreen(notesViewModel: miViewModel, navController: NavController, navigationType: NotesAppNavigationType){
+fun BodyContentTasksScreen(
+    viewModel: miViewModel,
+    navController: NavController,
+    navigationType: NotesAppNavigationType
+){
     Box(modifier = Modifier.fillMaxSize()){
         Column(
             modifier = Modifier,
@@ -70,7 +89,7 @@ fun BodyContentTasksScreen(notesViewModel: miViewModel, navController: NavContro
             //.background(colorResource(id = R.color.Secundario))
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Content(notesViewModel, navController, navigationType)
+            Content(viewModel, navController, navigationType)
         }
 
     }
@@ -79,12 +98,25 @@ fun BodyContentTasksScreen(notesViewModel: miViewModel, navController: NavContro
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Content(notesViewModel: miViewModel, navController: NavController, navigationType: NotesAppNavigationType){
-
+private fun Content(
+    viewModel: miViewModel,
+    navController: NavController,
+    navigationType: NotesAppNavigationType
+){
     //Variable para el ViewModel
-    val miViewModel = viewModel<MainViewModel>()
+    val _uiState by viewModel.uiState.collectAsState()
+    val tasks = _uiState.tasks
+    val openDialog = remember { mutableStateOf(false) }
 
     Scaffold (
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = { navController.navigate(AppScreens.AddTaskScreen.route) },
+            ){
+                Icon(Icons.Filled.Add, null)
+                Text("Agregar Tarea")
+            }
+        },
         topBar = {
             var MyTitle = stringResource(id = R.string.tareas)
             TopAppBar(
@@ -109,7 +141,7 @@ private fun Content(notesViewModel: miViewModel, navController: NavController, n
             // PARA PANTALLAS COMPACTAS, USAR UNA BARRA DE NAVEGACION INFERIOR
             if(navigationType == NotesAppNavigationType.BOTTOM_NAVIGATION){
                 NavigationBar {
-                    var selectedItem by remember { mutableStateOf(1) }
+                    var selectedItem by remember { mutableStateOf(1 )}
                     bottomNavItems.forEachIndexed { index, item ->
                         NavigationBarItem(
                             selected = selectedItem == index,
@@ -171,24 +203,18 @@ private fun Content(notesViewModel: miViewModel, navController: NavController, n
                             .fillMaxHeight()
                             .padding(start = 20.dp, top = 5.dp, end = 20.dp, bottom = 5.dp)
                     ){
-                        LazyColumn(
-                            modifier = Modifier
-                                .padding(4.dp)
-                        ){
-                            /*
-                            items(dataTareas){
-                                Tarjeta(titulo = it.titulo, descripcion = it.descripcion, it.fecha)
-                            }
+                        TasksList(
+                            tasks = tasks,
+                            openDialog = openDialog,
+                            navController = navController,
+                            viewModel = viewModel
+                        )
 
-                             */
-
-                        }
                     }
                 }
             }
 
         }
-
     ){
         // CONTENIDO PARA PANTALLAS COMPACTAS
         if(navigationType == NotesAppNavigationType.BOTTOM_NAVIGATION){
@@ -198,17 +224,13 @@ private fun Content(notesViewModel: miViewModel, navController: NavController, n
                     .fillMaxHeight(0.92f)
                     .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 0.dp)
             ){
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(4.dp)
-                ){
-                    /*
-                    items(dataTareas){
-                        Tarjeta(titulo = it.titulo, descripcion = it.descripcion, it.fecha)
-                    }
-                     */
+                TasksList(
+                    tasks = tasks,
+                    openDialog = openDialog,
+                    navController = navController,
+                    viewModel = viewModel
+                )
 
-                }
             }
         }
         // CONTENIDO PARA PANTALLAS MEDIANAS
@@ -219,17 +241,12 @@ private fun Content(notesViewModel: miViewModel, navController: NavController, n
                     .fillMaxHeight(0.92f)
                     .padding(start = 80.dp, top = 80.dp, end = 20.dp, bottom = 20.dp)
             ){
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(4.dp)
-                ){
-                    /*
-                    items(dataTareas){
-                        Tarjeta(titulo = it.titulo, descripcion = it.descripcion, it.fecha)
-                    }
-                     */
-
-                }
+                TasksList(
+                    tasks = tasks,
+                    openDialog = openDialog,
+                    navController = navController,
+                    viewModel = viewModel
+                )
             }
         }
         // PARA PANTALLAS EXTENSAS, EL CONTENIDO SE INCLUYE CON EL NAVIGATION DRAWER
@@ -237,9 +254,32 @@ private fun Content(notesViewModel: miViewModel, navController: NavController, n
     }
 }
 
+
+@Composable
+private fun TasksList(
+    tasks: List<Task>,
+    openDialog: MutableState<Boolean>,
+    navController: NavController,
+    viewModel: miViewModel
+){
+    LazyColumn(
+        contentPadding = PaddingValues(12.dp)
+    ){
+        itemsIndexed(tasks){index, task ->
+            Tarjeta(task, openDialog, navController, viewModel)
+        }
+    }
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Tarjeta(titulo: String, descripcion: String, fecha: String){
+private fun Tarjeta(
+    task: Task,
+    openDialog: MutableState<Boolean>,
+    navController: NavController,
+    viewModel: miViewModel
+){
     var showMenuAffair by  remember{ mutableStateOf(false) }
 
     val context = LocalContext.current
@@ -253,14 +293,14 @@ private fun Tarjeta(titulo: String, descripcion: String, fecha: String){
         ,
         onClick = {
             showMenuAffair = !showMenuAffair
-        }
+        },
     ) {
         Column (
             modifier = Modifier
                 .padding(start = 10.dp, top = 4.dp, bottom = 8.dp)
         ) {
             Text(
-                text = titulo,
+                text = task.titulo,
                 modifier = Modifier
                     .padding(top = 6.dp),
                 textAlign = TextAlign.Center,
@@ -268,13 +308,7 @@ private fun Tarjeta(titulo: String, descripcion: String, fecha: String){
                 fontSize = 25.sp
             )
             Text(
-                text = descripcion,
-                modifier = Modifier
-                    .padding(2.dp),
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = fecha,
+                text = task.descripcion,
                 modifier = Modifier
                     .padding(2.dp),
                 textAlign = TextAlign.Center
@@ -295,28 +329,8 @@ private fun Tarjeta(titulo: String, descripcion: String, fecha: String){
             DropdownMenuItem(
                 onClick = {
                     showMenuAffair = !showMenuAffair
-                }) {
-                Icon(
-                    imageVector = Icons.Filled.Handshake,
-                    contentDescription = "Terminado"
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(text = stringResource(id = R.string.terminado))
-            }
-            DropdownMenuItem(
-                onClick = {
-                    showMenuAffair = !showMenuAffair
-                }) {
-                Icon(
-                    imageVector = Icons.Filled.Star,
-                    contentDescription = "Destacar"
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(text = stringResource(id = R.string.destacado))
-            }
-            DropdownMenuItem(
-                onClick = {
-                    showMenuAffair = !showMenuAffair
+                    navController.navigate(AppScreens.EditTaskScreen.route)
+                    Constants.General.tarea = task
                 }) {
                 Icon(
                     imageVector = Icons.Filled.Edit,
@@ -328,6 +342,8 @@ private fun Tarjeta(titulo: String, descripcion: String, fecha: String){
             DropdownMenuItem(
                 onClick = {
                     showMenuAffair = !showMenuAffair
+                    openDialog.value = true
+
                 }) {
                 Icon(
                     imageVector = Icons.Filled.Delete,
@@ -339,15 +355,78 @@ private fun Tarjeta(titulo: String, descripcion: String, fecha: String){
 
         }
     }
+    DeleteDialog(task, openDialog, viewModel)
     Spacer(modifier = Modifier.height(15.dp))
+}
+
+
+@Composable
+private fun DeleteDialog(
+    task: Task,
+    openDialog: MutableState<Boolean>,
+    viewModel: miViewModel
+) {
+    if (openDialog.value) {
+        AlertDialog(
+            onDismissRequest = {
+                openDialog.value = false
+            },
+            title = {
+                Text(text = "Borrar nota?")
+            },
+            text = {
+                Column() {
+                    Text("Vamos a eliminar esta madre?")
+                }
+            },
+            buttons = {
+                Row(
+                    modifier = Modifier.padding(all = 8.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Column() {
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            onClick = {
+                                viewModel.deleteTask(task)
+                                openDialog.value = false
+                            }
+                        ) {
+                            Text("Simon")
+                        }
+                        Spacer(modifier = Modifier.padding(12.dp))
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            onClick = {
+                                openDialog.value = false
+                            }
+                        ) {
+                            Text("No")
+                        }
+                    }
+
+                }
+            }
+        )
+    }
 }
 
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun TasksScreen(notesViewModel: miViewModel, navController: NavController, navigationType: NotesAppNavigationType){
+fun TasksScreen(viewModel: miViewModel, navController: NavController, navigationType: NotesAppNavigationType){
     Scaffold {
-        BodyContentTasksScreen(notesViewModel, navController, navigationType)
+        BodyContentTasksScreen(viewModel, navController, navigationType)
     }
+
 }
+

@@ -102,79 +102,7 @@ private fun Content(viewModel: miViewModel, navController: NavController, naviga
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
-        },
-        bottomBar = {
-            // PARA PANTALLAS COMPACTAS, USAR UNA BARRA DE NAVEGACION INFERIOR
-            if(navigationType == NotesAppNavigationType.BOTTOM_NAVIGATION){
-                NavigationBar {
-                    var selectedItem by remember { mutableStateOf(2) }
-                    bottomNavItems.forEachIndexed { index, item ->
-                        NavigationBarItem(
-                            selected = selectedItem == index,
-                            onClick = {
-                                selectedItem = index
-                                navController.navigate(item.ruta)
-                            },
-                            label = { Text(text = item.nombre) },
-                            icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
-                        )
-                    }
-                }
-            }
-            // PARA PANTALLAS MEDIUM O MEDIANAS, USAR UN NAVIGATION RAIL
-            else if(navigationType == NotesAppNavigationType.NAVIGATION_RAIL){
-                NavigationRail(
-                    modifier = Modifier.padding(top = 80.dp)
-                ) {
-                    var selectedItem by remember { mutableStateOf(2) }
-                    bottomNavItems.forEachIndexed { index, item ->
-                        NavigationRailItem(
-                            selected = selectedItem == index,
-                            onClick = {
-                                selectedItem = index
-                                navController.navigate(item.ruta)
-                            },
-                            label = { Text(text = item.nombre) },
-                            icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
-                        )
-                    }
-                }
-            }
-            // PARA PANTALLAS GRANDES O EXTENSAS, USAR UN NAVIGATION DRAWER
-            else if(navigationType == NotesAppNavigationType.PERMANENT_NAVIGATION_DRAWER){
-                PermanentNavigationDrawer(
-                    drawerContent = {
-                        ModalDrawerSheet(
-                            modifier = Modifier.fillMaxWidth(0.2f)
-                        ) {
-                            var selectedItem by remember { mutableStateOf(2) }
-                            bottomNavItems.forEachIndexed { index, item ->
-                                NavigationDrawerItem(
-                                    selected = selectedItem == index,
-                                    onClick = {
-                                        selectedItem = index
-                                        navController.navigate(item.ruta)
-                                    },
-                                    label = { Text(text = item.nombre) },
-                                    icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
-                                )
-                            }
-                        }
-                    },
-                    Modifier.padding(top = 80.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .padding(start = 20.dp, top = 5.dp, end = 20.dp, bottom = 5.dp)
-                    ){
-                        UI(viewModel, miViewModel, navController)
-                    }
-                }
-            }
         }
-
     ){
         // CONTENIDO PARA PANTALLAS COMPACTAS
         if(navigationType == NotesAppNavigationType.BOTTOM_NAVIGATION){
@@ -199,7 +127,16 @@ private fun Content(viewModel: miViewModel, navController: NavController, naviga
             }
         }
         // PARA PANTALLAS EXTENSAS, EL CONTENIDO SE INCLUYE CON EL NAVIGATION DRAWER
-
+        else if(navigationType == NotesAppNavigationType.PERMANENT_NAVIGATION_DRAWER){
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(start = 20.dp, top = 5.dp, end = 20.dp, bottom = 5.dp)
+            ){
+                UI(viewModel, miViewModel, navController)
+            }
+        }
     }
 }
 
@@ -231,9 +168,24 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                     currentTitulo.value = value
                 },
                 label = { Text(stringResource(id = R.string.titulo)) },
-                placeholder = { Text(stringResource(id = R.string.agregar_titulo)) }
+                placeholder = { Text(stringResource(id = R.string.agregar_titulo)) },
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        item {
+            // CAJA DE TEXTO PARA LA DESCRIPCI[ON
+            TextField(
+                value = currentDescripcion.value,
+                onValueChange = { value ->
+                    currentDescripcion.value = value
+                },
+                label = { Text(stringResource(id = R.string.descripcion)) },
+                placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(30.dp))
         }
 
         item {
@@ -284,19 +236,6 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        item {
-            // CAJA DE TEXTO PARA LA DESCRIPCI[ON
-            TextField(
-                value = currentDescripcion.value,
-                onValueChange = { value ->
-                    currentDescripcion.value = value
-                },
-                label = { Text(stringResource(id = R.string.descripcion)) },
-                placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) }
-            )
-            Spacer(modifier = Modifier.height(30.dp))
         }
 
         item {

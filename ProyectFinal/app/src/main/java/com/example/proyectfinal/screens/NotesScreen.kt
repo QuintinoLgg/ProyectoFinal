@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
@@ -41,10 +42,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectfinal.R
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -103,6 +108,14 @@ private fun Content(
     val openDialog = remember { mutableStateOf(false) }
 
     Scaffold (
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = { navController.navigate(AppScreens.AddNoteScreen.route) },
+            ){
+                Icon(Icons.Filled.Add, null)
+                Text("Agregar Nota")
+            }
+        },
         topBar = {
             var MyTitle = stringResource(id = R.string.notas)
             TopAppBar(
@@ -233,7 +246,6 @@ private fun Content(
                     navController = navController,
                     viewModel = viewModel
                 )
-
             }
         }
         // PARA PANTALLAS EXTENSAS, EL CONTENIDO SE INCLUYE CON EL NAVIGATION DRAWER
@@ -252,8 +264,8 @@ private fun NotesList(
     LazyColumn(
         contentPadding = PaddingValues(12.dp)
     ){
-        itemsIndexed(notes){index, note ->
-            Tarjeta(note, openDialog, navController, viewModel)
+        items(notes){item ->
+            Tarjeta(item, openDialog, navController, viewModel)
         }
     }
 }
@@ -330,7 +342,6 @@ private fun Tarjeta(
                 onClick = {
                     showMenuAffair = !showMenuAffair
                     openDialog.value = true
-
                 }) {
                 Icon(
                     imageVector = Icons.Filled.Delete,
@@ -339,7 +350,6 @@ private fun Tarjeta(
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(text = stringResource(id = R.string.eliminar))
             }
-
         }
     }
     DeleteDialog(note, openDialog, viewModel)
@@ -380,6 +390,7 @@ private fun DeleteDialog(
                             ),
                             onClick = {
                                 viewModel.deleteNote(note)
+                                openDialog.value = false
                             }
                         ) {
                             Text("Simon")

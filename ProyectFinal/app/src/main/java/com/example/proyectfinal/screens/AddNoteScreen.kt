@@ -106,79 +106,7 @@ private fun Content(viewModel: miViewModel, navController: NavController, naviga
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
-        },
-        bottomBar = {
-            // PARA PANTALLAS COMPACTAS, USAR UNA BARRA DE NAVEGACION INFERIOR
-            if(navigationType == NotesAppNavigationType.BOTTOM_NAVIGATION){
-                NavigationBar {
-                    var selectedItem by remember { mutableStateOf(2) }
-                    bottomNavItems.forEachIndexed { index, item ->
-                        NavigationBarItem(
-                            selected = selectedItem == index,
-                            onClick = {
-                                selectedItem = index
-                                navController.navigate(item.ruta)
-                            },
-                            label = { Text(text = item.nombre) },
-                            icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
-                        )
-                    }
-                }
-            }
-            // PARA PANTALLAS MEDIUM O MEDIANAS, USAR UN NAVIGATION RAIL
-            else if(navigationType == NotesAppNavigationType.NAVIGATION_RAIL){
-                NavigationRail(
-                    modifier = Modifier.padding(top = 80.dp)
-                ) {
-                    var selectedItem by remember { mutableStateOf(2) }
-                    bottomNavItems.forEachIndexed { index, item ->
-                        NavigationRailItem(
-                            selected = selectedItem == index,
-                            onClick = {
-                                selectedItem = index
-                                navController.navigate(item.ruta)
-                            },
-                            label = { Text(text = item.nombre) },
-                            icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
-                        )
-                    }
-                }
-            }
-            // PARA PANTALLAS GRANDES O EXTENSAS, USAR UN NAVIGATION DRAWER
-            else if(navigationType == NotesAppNavigationType.PERMANENT_NAVIGATION_DRAWER){
-                PermanentNavigationDrawer(
-                    drawerContent = {
-                        ModalDrawerSheet(
-                            modifier = Modifier.fillMaxWidth(0.2f)
-                        ) {
-                            var selectedItem by remember { mutableStateOf(2) }
-                            bottomNavItems.forEachIndexed { index, item ->
-                                NavigationDrawerItem(
-                                    selected = selectedItem == index,
-                                    onClick = {
-                                        selectedItem = index
-                                        navController.navigate(item.ruta)
-                                    },
-                                    label = { Text(text = item.nombre) },
-                                    icon = { Icon(item.icono, contentDescription = "${item.nombre} Icon") }
-                                )
-                            }
-                        }
-                    },
-                    Modifier.padding(top = 80.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .padding(start = 20.dp, top = 5.dp, end = 20.dp, bottom = 5.dp)
-                    ){
-                        UI(viewModel, miViewModel, navController)
-                    }
-                }
-            }
         }
-
     ){
         // CONTENIDO PARA PANTALLAS COMPACTAS
         if(navigationType == NotesAppNavigationType.BOTTOM_NAVIGATION){
@@ -231,12 +159,13 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
             Spacer(modifier = Modifier.height(16.dp))
         }
 
+        /*
         item {
             // COMBOBOX PARA ESCOGER NOTA O TAREA
             val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
             ComboBox(options, stringResource(id = R.string.asunto), miViewModel)
             Spacer(modifier = Modifier.height(16.dp))
-        }
+        }*/
 
         /*
         item {
@@ -244,6 +173,20 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
             DatePicker(miViewModel)
             Spacer(modifier = Modifier.height(16.dp))
         }*/
+
+        item {
+            // CAJA DE TEXTO PARA LA DESCRIPCI[ON
+            TextField(
+                value = currentDescripcion.value,
+                onValueChange = { value ->
+                    currentDescripcion.value = value
+                },
+                label = { Text(stringResource(id = R.string.descripcion)) },
+                placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(30.dp))
+        }
 
         item {
             // BOTONES DE MULTIMEDIA
@@ -296,20 +239,6 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
         }
 
         item {
-            // CAJA DE TEXTO PARA LA DESCRIPCI[ON
-            TextField(
-                value = currentDescripcion.value,
-                onValueChange = { value ->
-                    currentDescripcion.value = value
-                },
-                label = { Text(stringResource(id = R.string.descripcion)) },
-                placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(30.dp))
-        }
-
-        item {
             // BOTÓN GUARDAR Y CANCELAR
             Row {
                 //val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
@@ -317,7 +246,10 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                 Button(
                     onClick = {
                         viewModel.insertNote(
-                            Note(titulo = currentTitulo.value, descripcion = currentDescripcion.value)
+                            Note(
+                                id = 0,
+                                titulo = currentTitulo.value,
+                                descripcion = currentDescripcion.value)
                         )
                         navController.popBackStack()
                     },
@@ -359,7 +291,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
 
 
 
-
+/*
 // DATETIME PICKER PERSONALIZADO
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -402,7 +334,9 @@ fun DatePicker(miViewModel: MainViewModel){
     )
 }
 
+ */
 
+/*
 // COMBOBOX PERSONALIZADO
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -442,6 +376,8 @@ fun ComboBox(items: List<String>, etiqueta: String, miViewModel: MainViewModel) 
         }
     }
 }
+
+ */
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
