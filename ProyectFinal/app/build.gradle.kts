@@ -87,6 +87,15 @@ dependencies {
     // DISEÑO ADAPTABLE
     implementation("androidx.compose.material3:material3-window-size-class:1.0.1")
 
+    //PERMISOS
+    implementation("com.google.accompanist:accompanist-permissions:0.30.1")
+
+    // ExoPlayer
+    implementation("com.google.android.exoplayer:exoplayer:2.15.1")
+
+    // Coil. Para cargar imagenes de manera asyncrona
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
     // BASE DE DATOS DE ROOM
     implementation("androidx.room:room-runtime:${rootProject.extra["room_version"]}")
     implementation("androidx.navigation:navigation-compose:2.5.3")

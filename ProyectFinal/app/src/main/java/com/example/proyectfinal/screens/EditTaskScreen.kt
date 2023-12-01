@@ -3,6 +3,9 @@ package com.example.proyectfinal.screens
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,13 +36,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.VideoCall
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationBar
@@ -55,18 +63,25 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.example.proyectfinal.R
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.proyectfinal.Constants
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
 import com.example.proyectfinal.models.Note
 import com.example.proyectfinal.models.Task
 import com.example.proyectfinal.ui.miViewModel
+import com.example.proyectfinal.ui.theme.ComposeFileProvider
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ui.PlayerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -206,53 +221,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
         }
 
         item {
-            // BOTONES DE MULTIMEDIA
-            Column (
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(id = R.string.apartado_multimedia),
-                    fontSize = 15.sp,
-                    textAlign = TextAlign.Center
-                )
-                Row {
-                    // BOTON DE GALERIA
-                    Button(
-                        onClick = { /*TODO*/ }
-                    ) {
-                        Icon(
-                            Icons.Filled.Image,
-                            contentDescription = "Galería",
-                            modifier = Modifier.size(25.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(10.dp))
-                    // BOTON DE GRABADORA
-                    Button(
-                        onClick = { /*TODO*/ }
-                    ) {
-                        Icon(
-                            Icons.Filled.Mic,
-                            contentDescription = "Micrófono",
-                            modifier = Modifier.size(25.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(10.dp))
-                    // BOTON DE OPCIONES
-                    Button(
-                        onClick = { /*TODO*/ }
-                    ) {
-                        Icon(
-                            Icons.Default.MoreVert,
-                            contentDescription = "Más opciones",
-                            modifier = Modifier.size(25.dp)
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
+            Multimedia()
         }
 
         item {

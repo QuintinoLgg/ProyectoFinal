@@ -182,53 +182,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
         }
 
         item {
-            // BOTONES DE MULTIMEDIA
-            Column (
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(id = R.string.apartado_multimedia),
-                    fontSize = 15.sp,
-                    textAlign = TextAlign.Center
-                )
-                Row {
-                    // BOTON DE GALERIA
-                    Button(
-                        onClick = { /*TODO*/ }
-                    ) {
-                        Icon(
-                            Icons.Filled.Image,
-                            contentDescription = "Galería",
-                            modifier = Modifier.size(25.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(10.dp))
-                    // BOTON DE GRABADORA
-                    Button(
-                        onClick = { /*TODO*/ }
-                    ) {
-                        Icon(
-                            Icons.Filled.Mic,
-                            contentDescription = "Micrófono",
-                            modifier = Modifier.size(25.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(10.dp))
-                    // BOTON DE OPCIONES
-                    Button(
-                        onClick = { /*TODO*/ }
-                    ) {
-                        Icon(
-                            Icons.Default.MoreVert,
-                            contentDescription = "Más opciones",
-                            modifier = Modifier.size(25.dp)
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
+            Multimedia()
         }
 
         item {
