@@ -6,6 +6,7 @@ import android.app.DatePickerDialog
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -71,6 +72,7 @@ import androidx.navigation.NavController
 import com.example.proyectfinal.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import coil.compose.rememberImagePainter
 import com.example.proyectfinal.Constants
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
@@ -172,6 +174,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
     val currentTitulo = remember { mutableStateOf("") }
     val currentDescripcion = remember { mutableStateOf("") }
     val currentFecha = remember { mutableStateOf("") }
+    val currentFoto = remember { mutableStateOf("") }
     val task = Constants.General.tarea
 
     LaunchedEffect(true){
@@ -179,6 +182,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
             currentTitulo.value = task.titulo
             currentDescripcion.value = task.descripcion
             currentFecha.value = task.fecha
+            currentFoto.value = task.imageUri
         }
     }
 
@@ -221,7 +225,20 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
         }
 
         item {
-            //Multimedia()
+            Multimedia(currentFoto)
+        }
+
+        item{
+            // Mostrar la imagen seleccionada
+            if (currentFoto.value.isNotEmpty()) {
+                Image(
+                    painter = rememberImagePainter(data = currentFoto.value),
+                    contentDescription = "Selected Image",
+                    modifier = Modifier
+                        .size(300.dp)
+                        .padding(16.dp)
+                )
+            }
         }
 
         item {
@@ -236,7 +253,8 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                                 id = task.id,
                                 titulo = currentTitulo.value,
                                 descripcion = currentDescripcion.value,
-                                fecha = currentFecha.value
+                                fecha = currentFecha.value,
+                                imageUri = currentFoto.value
                             )
                         )
                         navController.popBackStack()

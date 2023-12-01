@@ -213,6 +213,19 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
             Multimedia(currentFoto)
         }
 
+        item{
+            // Mostrar la imagen seleccionada
+            if (currentFoto.value.isNotEmpty()) {
+                Image(
+                    painter = rememberImagePainter(data = currentFoto.value),
+                    contentDescription = "Selected Image",
+                    modifier = Modifier
+                        .size(300.dp)
+                        .padding(16.dp)
+                )
+            }
+        }
+
         item {
             // BOTÓN GUARDAR Y CANCELAR
             Row {
@@ -263,18 +276,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
             }
         }
 
-        item{
-            // Mostrar la imagen seleccionada
-            if (currentFoto.value.isNotEmpty()) {
-                Image(
-                    painter = rememberImagePainter(data = currentFoto.value),
-                    contentDescription = "Selected Image",
-                    modifier = Modifier
-                        .size(200.dp)
-                        .padding(16.dp)
-                )
-            }
-        }
+
     }
 }
 
@@ -351,7 +353,7 @@ fun Multimedia(ruta: MutableState<String>){
                     contentDescription = "Selected image",
                 )
             }
-            // if(hasVideo) {VideoPlayer(videoUri = imageUri!!.toString())}
+            if(hasVideo) {VideoPlayer(videoUri = Uri.parse(imageUri!!))}
         }
 
         Text(

@@ -11,7 +11,8 @@ data class Task(
     @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo(name = "titulo") val titulo: String,
     @ColumnInfo(name = "descripcion") val descripcion: String,
-    @ColumnInfo(name = "fecha") val fecha: String
+    @ColumnInfo(name = "fecha") val fecha: String,
+    @ColumnInfo(name = "uri") val imageUri: String
 )
 
 @Entity(tableName = Constants.NotesTable.NAME)
