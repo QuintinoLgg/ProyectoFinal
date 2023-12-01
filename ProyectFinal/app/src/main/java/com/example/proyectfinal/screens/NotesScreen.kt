@@ -1,7 +1,6 @@
 package com.example.proyectfinal.screens
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,24 +13,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -44,22 +36,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectfinal.R
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Handshake
-import androidx.compose.material.icons.filled.Task
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationDrawerItem
@@ -67,32 +53,26 @@ import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.lifecycle.Observer
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import com.example.proyectfinal.Constants
-import com.example.proyectfinal.Constants.orPlaceHolderList
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
-import com.example.proyectfinal.data.dataNotas
 import com.example.proyectfinal.models.Note
 import com.example.proyectfinal.navigation.AppScreens
-import com.example.proyectfinal.ui.NotesViewModel
+import com.example.proyectfinal.ui.miViewModel
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
 
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @Composable
 fun BodyContentNotesScreen(
-    notesViewModel: NotesViewModel,
+    viewModel: miViewModel,
     navController: NavController,
     navigationType: NotesAppNavigationType
 ){
@@ -103,7 +83,7 @@ fun BodyContentNotesScreen(
                 //.background(colorResource(id = R.color.Secundario))
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Content(notesViewModel, navController, navigationType)
+            Content(viewModel, navController, navigationType)
         }
 
     }
@@ -113,14 +93,13 @@ fun BodyContentNotesScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Content(
-    viewModel: NotesViewModel,
+    viewModel: miViewModel,
     navController: NavController,
     navigationType: NotesAppNavigationType
 ){
     //Variable para el ViewModel
-    val miViewModel = viewModel<MainViewModel>()
-    val notes = viewModel.notes.observeAsState()
-    val notesToDelete = remember { mutableStateOf(listOf<Note>()) }
+    val _uiState by viewModel.uiState.collectAsState()
+    val notes = _uiState.notes
     val openDialog = remember { mutableStateOf(false) }
 
     Scaffold (
@@ -211,21 +190,11 @@ private fun Content(
                             .padding(start = 20.dp, top = 5.dp, end = 20.dp, bottom = 5.dp)
                     ){
                         NotesList(
-                            notes = notes.value.orPlaceHolderList(),
-                            notesToDelete = notesToDelete,
+                            notes = notes,
                             openDialog = openDialog,
                             navController = navController
                         )
 
-                        DeleteDialog(
-                            openDialog = openDialog,
-                            notesToDelete = notesToDelete,
-                            action = {
-                                notesToDelete.value.forEach{
-                                    viewModel.deleteNotes(it)
-                                }
-                            }
-                        )
                     }
                 }
             }
@@ -241,21 +210,11 @@ private fun Content(
                     .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 0.dp)
             ){
                 NotesList(
-                    notes = notes.value.orPlaceHolderList(),
-                    notesToDelete = notesToDelete,
+                    notes = notes,
                     openDialog = openDialog,
                     navController = navController
                 )
 
-                DeleteDialog(
-                    openDialog = openDialog,
-                    notesToDelete = notesToDelete,
-                    action = {
-                        notesToDelete.value.forEach{
-                            viewModel.deleteNotes(it)
-                        }
-                    }
-                )
             }
         }
         // CONTENIDO PARA PANTALLAS MEDIANAS
@@ -267,21 +226,11 @@ private fun Content(
                     .padding(start = 80.dp, top = 80.dp, end = 20.dp, bottom = 20.dp)
             ){
                 NotesList(
-                    notes = notes.value.orPlaceHolderList(),
-                    notesToDelete = notesToDelete,
+                    notes = notes,
                     openDialog = openDialog,
                     navController = navController
                 )
 
-                DeleteDialog(
-                    openDialog = openDialog,
-                    notesToDelete = notesToDelete,
-                    action = {
-                        notesToDelete.value.forEach{
-                            viewModel.deleteNotes(it)
-                        }
-                    }
-                )
             }
         }
         // PARA PANTALLAS EXTENSAS, EL CONTENIDO SE INCLUYE CON EL NAVIGATION DRAWER
@@ -294,14 +243,13 @@ private fun Content(
 private fun NotesList(
     notes: List<Note>,
     openDialog: MutableState<Boolean>,
-    notesToDelete: MutableState<List<Note>>,
     navController: NavController
 ){
     LazyColumn(
         contentPadding = PaddingValues(12.dp)
     ){
         itemsIndexed(notes){index, note ->
-            Tarjeta(note, notesToDelete, openDialog, navController)
+            Tarjeta(note, openDialog, navController)
         }
     }
 }
@@ -311,7 +259,6 @@ private fun NotesList(
 @Composable
 private fun Tarjeta(
     note: Note,
-    notesToDelete: MutableState<List<Note>>,
     openDialog: MutableState<Boolean>,
     navController: NavController
 ){
@@ -364,8 +311,6 @@ private fun Tarjeta(
             DropdownMenuItem(
                 onClick = {
                     showMenuAffair = !showMenuAffair
-                    // ACCI[ON DE EDITAR
-                    Constants.NOTA_EDITAR = note.id?:0
                     navController.navigate(AppScreens.EditNoteScreen.route)
                 }) {
                 Icon(
@@ -379,7 +324,6 @@ private fun Tarjeta(
                 onClick = {
                     showMenuAffair = !showMenuAffair
                     openDialog.value = true
-                    notesToDelete.value = mutableListOf(note)
                 }) {
                 Icon(
                     imageVector = Icons.Filled.Delete,
@@ -460,9 +404,9 @@ private fun DeleteDialog(
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun NotesScreen(notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
+fun NotesScreen(viewModel: miViewModel, navController: NavController, navigationType: NotesAppNavigationType){
     Scaffold {
-        BodyContentNotesScreen(notesViewModel, navController, navigationType)
+        BodyContentNotesScreen(viewModel, navController, navigationType)
     }
 
 }

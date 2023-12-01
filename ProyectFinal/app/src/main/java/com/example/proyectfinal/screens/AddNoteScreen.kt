@@ -56,24 +56,24 @@ import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.proyectfinal.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
-import com.example.proyectfinal.ui.NotesViewModel
+import com.example.proyectfinal.models.Note
+import com.example.proyectfinal.ui.miViewModel
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @Composable
-fun BodyContentAddNote(notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
+fun BodyContentAddNote(viewModel: miViewModel, navController: NavController, navigationType: NotesAppNavigationType){
     Box(modifier = Modifier.fillMaxSize()){
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Content(notesViewModel, navController, navigationType)
+            Content(viewModel, navController, navigationType)
         }
     }
 }
@@ -82,7 +82,7 @@ fun BodyContentAddNote(notesViewModel: NotesViewModel, navController: NavControl
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Content(notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
+private fun Content(viewModel: miViewModel, navController: NavController, navigationType: NotesAppNavigationType){
     //Variable de ViewModel
     val miViewModel = viewModel<MainViewModel>()
 
@@ -173,7 +173,7 @@ private fun Content(notesViewModel: NotesViewModel, navController: NavController
                             .fillMaxHeight()
                             .padding(start = 20.dp, top = 5.dp, end = 20.dp, bottom = 5.dp)
                     ){
-                        UI(notesViewModel, miViewModel, navController)
+                        UI(viewModel, miViewModel, navController)
                     }
                 }
             }
@@ -188,7 +188,7 @@ private fun Content(notesViewModel: NotesViewModel, navController: NavController
                     .fillMaxHeight(0.92f)
                     .padding(start = 20.dp, top = 80.dp, end = 20.dp, bottom = 0.dp)
             ){
-                UI(notesViewModel, miViewModel, navController)
+                UI(viewModel, miViewModel, navController)
             }
         }
         // CONTENIDO PARA PANTALLAS MEDIANAS
@@ -199,7 +199,7 @@ private fun Content(notesViewModel: NotesViewModel, navController: NavController
                     .fillMaxHeight(0.92f)
                     .padding(start = 80.dp, top = 80.dp, end = 20.dp, bottom = 20.dp)
             ){
-                UI(notesViewModel, miViewModel, navController)
+                UI(viewModel, miViewModel, navController)
             }
         }
         // PARA PANTALLAS EXTENSAS, EL CONTENIDO SE INCLUYE CON EL NAVIGATION DRAWER
@@ -209,7 +209,7 @@ private fun Content(notesViewModel: NotesViewModel, navController: NavController
 
 
 @Composable
-private fun UI(notesViewModel: NotesViewModel, miViewModel: MainViewModel, navController: NavController){
+private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController: NavController){
     val currentTitulo = remember { mutableStateOf("") }
     val currentDescripcion = remember { mutableStateOf("") }
 
@@ -316,9 +316,8 @@ private fun UI(notesViewModel: NotesViewModel, miViewModel: MainViewModel, navCo
                 // BOTON DE GUARDAR
                 Button(
                     onClick = {
-                        notesViewModel.createNote(
-                            currentTitulo.value,
-                            currentDescripcion.value
+                        viewModel.insertNote(
+                            Note(titulo = currentTitulo.value, descripcion = currentDescripcion.value)
                         )
                         navController.popBackStack()
                     },
@@ -446,9 +445,9 @@ fun ComboBox(items: List<String>, etiqueta: String, miViewModel: MainViewModel) 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun AddNoteScreen(notesViewModel: NotesViewModel, navController: NavController, navigationType: NotesAppNavigationType){
+fun AddNoteScreen(viewModel: miViewModel, navController: NavController, navigationType: NotesAppNavigationType){
     Scaffold {
-        BodyContentAddNote(notesViewModel, navController, navigationType)
+        BodyContentAddNote(viewModel, navController, navigationType)
     }
 }
 

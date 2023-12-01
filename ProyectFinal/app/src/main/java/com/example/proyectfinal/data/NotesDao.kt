@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.example.proyectfinal.models.Note
+import com.example.proyectfinal.models.Task
 
 @Dao
 interface NotesDao {
@@ -14,7 +15,7 @@ interface NotesDao {
     suspend fun getNoteById(id: Int) : Note?
 
     @Query("SELECT * FROM Notes")
-    fun getNotes() : LiveData<List<Note>>
+    fun getNotes() : List<Note>
 
     @Delete
     fun deleteNote(note: Note) : Int
@@ -24,4 +25,23 @@ interface NotesDao {
 
     @Insert
     fun insertNote(note: Note)
+}
+
+
+@Dao
+interface TaskDao {
+    @Query("SELECT * FROM Tasks WHERE Tasks.id=:id")
+    suspend fun getTaskById(id: Int) : Task?
+
+    @Query("SELECT * FROM Tasks")
+    fun getTasks() : List<Task>
+
+    @Delete
+    fun deleteTask(task: Task) : Int
+
+    @Update
+    fun updateTask(task: Task) : Int
+
+    @Insert
+    fun insertTask(task: Task)
 }
