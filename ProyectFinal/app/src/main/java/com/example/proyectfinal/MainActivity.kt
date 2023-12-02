@@ -53,101 +53,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             val context = LocalContext.current
             val viewModel = miViewModel(context)
-
             ProyectFinalTheme {
                 val windowSize = calculateWindowSizeClass(this)
                 Surface {
-                    var flag by remember {
-                        mutableStateOf(false)
-                    }
-
-                    val context = LocalContext.current
-                    val idCanal = "CanalMascota"
-                    val idNotificacion = 0
-
-                    LaunchedEffect(Unit){
-                        crearCanalNotificacion(idCanal, context)
-                    }
-
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                        modifier = Modifier
-                            .padding(18.dp)
-                            .fillMaxSize()
-                    ){
-                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            val permissionState = rememberPermissionState(
-                                permission = android.Manifest.permission.POST_NOTIFICATIONS
-                            )
-                            if (!permissionState.status.isGranted) {
-                                OutlinedButton(onClick = {
-                                    permissionState.launchPermissionRequest()
-                                }) {
-                                    Text(text = "Permitir notificaciones")
-                                }
-                            }
-                            Spacer(modifier = Modifier.size(16.dp))
-                        }
-
-                        Button(onClick = {
-                            notificacionesProgramadas(context)
-                            flag = true
-                        })
-                        {
-                            Text(text = "Notificaciones")
-                        }
-                    }
-
-                    if(flag === true){
-                        AppNavigation(viewModel, windowSize.widthSizeClass)
-                    }
+                    AppNavigation(viewModel, windowSize.widthSizeClass)
                 }
             }
         }
     }
 
-
-
-    private fun notificacionesProgramadas(context: Context) {
-        val intent = Intent(context, NotificacionProgramada::class.java)
-        val pendingIntent  = PendingIntent.getBroadcast(
-            context,
-            NOTIFICATION_ID,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        var alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        // Puedes programar alarmas exactas
-        AlarmManagerCompat.setExact(
-            alarmManager,
-            AlarmManager.RTC_WAKEUP,
-            Calendar.getInstance().timeInMillis + 10000,
-            pendingIntent
-        )
-
-    }
-
-    private fun crearCanalNotificacion(
-        idCanal: String,
-        context: Context
-    )
-    {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            val nombre = "CanalMascota"
-            val descripcion = "Canal de notificaciones Mascota"
-            val importancia = NotificationManager.IMPORTANCE_DEFAULT
-            val canal = NotificationChannel(idCanal, nombre, importancia)
-                .apply{
-                    description = descripcion
-                }
-            val notificationManager: NotificationManager =
-                context.getSystemService(Context.NOTIFICATION_SERVICE) as
-                        NotificationManager
-            notificationManager.createNotificationChannel(canal)
-        }
-    }
 }
 
 /*

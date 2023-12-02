@@ -17,7 +17,8 @@ class MainViewModel() : ViewModel() {
     }
 
 
-    var subject: MutableState<String> = mutableStateOf("Tarea")
+    var subject: MutableState<String> = mutableStateOf("Frecuencia")
+    var milisegundos: MutableState<Long> = mutableStateOf<Long>(0)
 
 
 
@@ -31,6 +32,37 @@ class MainViewModel() : ViewModel() {
     fun setdestiny(newdestiny: Double) {
         destiny.value = newdestiny
     }
+
+    var destinyYears: MutableState<Long> = mutableStateOf(0)
+    fun setdestinyYears(newdestinyYears: Long) {
+        destinyYears.value = newdestinyYears
+    }
+
+    var destinyMonths: MutableState<Long> = mutableStateOf(0)
+    fun setdestinyMonths(newdestinyMonths: Long) {
+        destinyMonths.value = newdestinyMonths
+    }
+
+    var destinyDays: MutableState<Long> = mutableStateOf(0)
+    fun setdestinyDays(newdestinyDays: Long) {
+        destinyDays.value = newdestinyDays
+    }
+
+    var destinyHours: MutableState<Long> = mutableStateOf(0)
+    fun setdestinyHours(newdestinyHours: Long) {
+        destinyHours.value = newdestinyHours
+    }
+
+    var destinyMinutes: MutableState<Long> = mutableStateOf(0)
+    fun setdestinyMinutes(newdestinyMinutes: Long) {
+        destinyMinutes.value = newdestinyMinutes
+    }
+
+    var destinyFrecuencia: MutableState<Int> = mutableStateOf(0)
+    fun setdestinyFrecuencia(newdestinyFrecuencia: Int) {
+        destinyFrecuencia.value = newdestinyFrecuencia
+    }
+
 
 }
 
