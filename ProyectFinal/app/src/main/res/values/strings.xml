@@ -37,4 +37,7 @@
 
     <string name="tareas">Tareas</string>
     <string name="notas">Notas</string>
+
+
+    <string name="record_audio"></string>
 </resources>

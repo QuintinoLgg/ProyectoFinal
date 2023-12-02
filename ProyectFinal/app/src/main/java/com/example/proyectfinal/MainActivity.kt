@@ -36,20 +36,34 @@ import androidx.core.app.AlarmManagerCompat
 import com.example.proyectfinal.navigation.AppNavigation
 import com.example.proyectfinal.ui.theme.ProyectFinalTheme
 import com.example.proyectfinal.ui.miViewModel
+import com.example.proyectfinal.ui.theme.AndroidAudioPlayer
+import com.example.proyectfinal.ui.theme.AndroidAudioRecorder
+import com.example.proyectfinal.ui.theme.GrabarAudioScreen
 import com.example.proyectfinal.ui.theme.NOTIFICATION_ID
 import com.example.proyectfinal.ui.theme.NotificacionProgramada
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import java.io.File
 import java.util.Calendar
 
 
 class MainActivity : ComponentActivity() {
+
+    private val recorder by lazy {
+        AndroidAudioRecorder(applicationContext)
+    }
+
+    private val player by lazy {
+        AndroidAudioPlayer(applicationContext)
+    }
+
+    private var audioFile: File? = null
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalPermissionsApi::class)
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             val context = LocalContext.current
             val viewModel = miViewModel(context)
@@ -57,6 +71,18 @@ class MainActivity : ComponentActivity() {
                 val windowSize = calculateWindowSizeClass(this)
                 Surface {
                     AppNavigation(viewModel, windowSize.widthSizeClass)
+                    GrabarAudioScreen(
+                        onClickStGra = {
+                            File(cacheDir, "audio.mp3").also {
+                                recorder.start(it)
+                                audioFile = it
+                            }
+
+                        },
+                        onClickSpGra = {recorder.stop()},
+                        onClickStRe = { audioFile?.let { player.start(it) } },
+                        onClickSpRe = {player.stop()}
+                    )
                 }
             }
         }
