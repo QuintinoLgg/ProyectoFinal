@@ -82,9 +82,13 @@ import com.example.proyectfinal.data.bottomNavItems
 import com.example.proyectfinal.models.Note
 import com.example.proyectfinal.models.Task
 import com.example.proyectfinal.ui.miViewModel
+import com.example.proyectfinal.ui.theme.AndroidAudioPlayer
+import com.example.proyectfinal.ui.theme.AndroidAudioRecorder
+import com.example.proyectfinal.ui.theme.GrabarAudioScreen
 import com.example.proyectfinal.ui.theme.NOTIFICATION_ID
 import com.example.proyectfinal.ui.theme.NotificacionProgramada
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
+import java.io.File
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -224,6 +228,34 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
         item {
             Multimedia(currentFoto)
         }
+
+
+        item {
+            // AUDIO
+            val context = LocalContext.current
+            val recorder by lazy {
+                AndroidAudioRecorder(context)
+            }
+
+            val player by lazy {
+                AndroidAudioPlayer(context)
+            }
+
+            var audioFile: File? = null
+
+            GrabarAudioScreen(
+                onClickStGra = {
+                    File(context.cacheDir, "audio.mp3").also {
+                        recorder.start(it)
+                        audioFile = it
+                    }
+                },
+                onClickSpGra = { recorder.stop() },
+                onClickStRe = { audioFile?.let { player.start(it) } },
+                onClickSpRe = { player.stop() }
+            )
+        }
+
 
         item {
             // BOTÓN GUARDAR Y CANCELAR

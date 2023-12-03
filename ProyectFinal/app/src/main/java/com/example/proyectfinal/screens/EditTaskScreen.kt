@@ -79,13 +79,17 @@ import com.example.proyectfinal.data.bottomNavItems
 import com.example.proyectfinal.models.Note
 import com.example.proyectfinal.models.Task
 import com.example.proyectfinal.ui.miViewModel
+import com.example.proyectfinal.ui.theme.AndroidAudioPlayer
+import com.example.proyectfinal.ui.theme.AndroidAudioRecorder
 import com.example.proyectfinal.ui.theme.ComposeFileProvider
+import com.example.proyectfinal.ui.theme.GrabarAudioScreen
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.Calendar
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
@@ -226,6 +230,32 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
 
         item {
             Multimedia(currentFoto)
+        }
+
+        item {
+            // AUDIO
+            val context = LocalContext.current
+            val recorder by lazy {
+                AndroidAudioRecorder(context)
+            }
+
+            val player by lazy {
+                AndroidAudioPlayer(context)
+            }
+
+            var audioFile: File? = null
+
+            GrabarAudioScreen(
+                onClickStGra = {
+                    File(context.cacheDir, "audio.mp3").also {
+                        recorder.start(it)
+                        audioFile = it
+                    }
+                },
+                onClickSpGra = { recorder.stop() },
+                onClickStRe = { audioFile?.let { player.start(it) } },
+                onClickSpRe = { player.stop() }
+            )
         }
 
         item{

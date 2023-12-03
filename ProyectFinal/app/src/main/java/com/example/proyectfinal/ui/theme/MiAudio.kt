@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AudioFile
+import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PlayCircle
@@ -76,7 +77,6 @@ fun GrabarAudioScreen( onClickStGra: () -> Unit,
                 .animateContentSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            // Show rationale dialog when needed
             rationaleState?.run { PermissionRationaleDialog(rationaleState = this) }
 
             PermissionRequestButton(
@@ -114,36 +114,39 @@ fun PermissionRequestButton(isGranted: Boolean, title: String,
                             onClickStRe: () -> Unit,
                             onClickSpRe: () -> Unit,
                             onClick: () -> Unit) {
+
     if (isGranted) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
-            Spacer(Modifier.size(10.dp))
+            //Spacer(Modifier.size(10.dp))
             Text(text = title, modifier = Modifier.background(Color.Transparent))
-            Spacer(Modifier.size(10.dp))
+            //Spacer(Modifier.size(10.dp))
 
         }
-        Spacer(modifier = Modifier.size(545.dp))
+        //Spacer(modifier = Modifier.size(545.dp))
         Row {
             Button(onClick = onClickStGra) {
-                Icon(imageVector = Icons.Default.AudioFile , contentDescription = "Iniciar Audio" )
+                Icon(imageVector = Icons.Default.FiberManualRecord, contentDescription = "Iniciar Audio" )
             }
             Button(onClick = onClickSpGra) {
-                Icon(imageVector = Icons.Default.Stop , contentDescription = "Iniciar Audio" )
+                Icon(imageVector = Icons.Default.Stop, contentDescription = "Iniciar Audio" )
             }
             Button(onClick = onClickStRe) {
-                Icon(imageVector = Icons.Default.PlayCircle , contentDescription = "Reproduce Audio" )
+                Icon(imageVector = Icons.Default.PlayArrow, contentDescription = "Reproduce Audio" )
             }
+            /*
             Button(onClick = onClickSpRe) {
-                Icon(imageVector = Icons.Default.Pause , contentDescription = "Pause Audio" )
-            }
+                Icon(imageVector = Icons.Default.Pause, contentDescription = "Pause Audio" )
+            }*/
         }
     } else {
         Button(onClick = onClick) {
-            Text("Request $title")
+            Text("Cede permiso para grabar audio $title")
         }
     }
 }

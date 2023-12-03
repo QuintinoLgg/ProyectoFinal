@@ -50,6 +50,7 @@ import java.util.Calendar
 
 class MainActivity : ComponentActivity() {
 
+    /*
     private val recorder by lazy {
         AndroidAudioRecorder(applicationContext)
     }
@@ -59,6 +60,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private var audioFile: File? = null
+    */
+
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalPermissionsApi::class)
     @RequiresApi(Build.VERSION_CODES.O)
@@ -71,6 +74,7 @@ class MainActivity : ComponentActivity() {
                 val windowSize = calculateWindowSizeClass(this)
                 Surface {
                     AppNavigation(viewModel, windowSize.widthSizeClass)
+                    /*
                     GrabarAudioScreen(
                         onClickStGra = {
                             File(cacheDir, "audio.mp3").also {
@@ -82,7 +86,7 @@ class MainActivity : ComponentActivity() {
                         onClickSpGra = {recorder.stop()},
                         onClickStRe = { audioFile?.let { player.start(it) } },
                         onClickSpRe = {player.stop()}
-                    )
+                    )*/
                 }
             }
         }
