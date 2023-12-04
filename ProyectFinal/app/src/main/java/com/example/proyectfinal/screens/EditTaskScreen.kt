@@ -179,6 +179,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
     val currentDescripcion = remember { mutableStateOf("") }
     val currentFecha = remember { mutableStateOf("") }
     val currentFoto = remember { mutableStateOf("") }
+    val currentVideo = remember { mutableStateOf("") }
     val task = Constants.General.tarea
 
     LaunchedEffect(true){
@@ -229,7 +230,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
         }
 
         item {
-            Multimedia(currentFoto)
+            Multimedia(currentFoto, currentVideo)
         }
 
         item {

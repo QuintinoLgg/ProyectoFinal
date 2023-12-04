@@ -171,6 +171,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
     val currentTitulo = remember { mutableStateOf("") }
     val currentDescripcion = remember { mutableStateOf("") }
     val currentFoto = remember { mutableStateOf("") }
+    val currentVideo = remember { mutableStateOf("") }
     val note = Constants.General.nota
 
     LaunchedEffect(true){
@@ -214,7 +215,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
         }
 
         item {
-            Multimedia(currentFoto)
+            Multimedia(currentFoto, currentVideo)
         }
 
         item {
@@ -268,7 +269,8 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                                 id = note.id,
                                 titulo = currentTitulo.value,
                                 descripcion = currentDescripcion.value,
-                                imageUri = currentFoto.value
+                                imageUri = currentFoto.value,
+                                videoUri = currentVideo.value
                             )
                         )
                         navController.popBackStack()
@@ -321,21 +323,31 @@ fun EditNoteScreen(viewModel: miViewModel, navController: NavController, navigat
 }
 
 @Composable
-fun Multimedia(ruta: MutableState<String>){
+fun Multimedia(
+    rutaImagen: MutableState<String>,
+    rutaVideo: MutableState<String>
+){
     //VARIABLES
     // 1
     var hasImage by remember {
         mutableStateOf(
-            if(ruta.value == "") false
+            if(rutaImagen.value == "") false
             else true
         )
     }
     var hasVideo by remember {
-        mutableStateOf(false)
+        mutableStateOf(
+            if(rutaVideo.value == "") false
+            else true
+        )
     }
     // 2
     var imageUri by remember {
-        mutableStateOf(ruta.value)
+        mutableStateOf(rutaImagen.value)
+    }
+
+    var videoUri by remember {
+        mutableStateOf(rutaVideo.value)
     }
 
     val imagePicker = rememberLauncherForActivityResult(
@@ -345,7 +357,7 @@ fun Multimedia(ruta: MutableState<String>){
             // 3
             hasImage = uri != null
             imageUri = uri.toString()
-            ruta.value = uri.toString()
+            rutaImagen.value = uri.toString()
         }
     )
 
@@ -373,17 +385,18 @@ fun Multimedia(ruta: MutableState<String>){
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // 4
-        if ((hasImage or hasVideo) && imageUri != "") {
-            // 5
-            if(hasImage){
-                AsyncImage(
-                    model = Uri.parse(imageUri),
-                    modifier = Modifier.size(300.dp),
-                    contentDescription = "Selected image",
-                )
-            }
-            if(hasVideo) {VideoPlayer(videoUri = Uri.parse(imageUri!!))}
+        if(hasImage && imageUri!=""){
+            AsyncImage(
+                model = Uri.parse(imageUri),
+                modifier = Modifier.size(300.dp),
+                contentDescription = "Selected image",
+            )
+        }
+
+        if(hasVideo && videoUri!="") {
+            VideoPlayer(
+                videoUri = Uri.parse(videoUri)
+            )
         }
 
         Text(
@@ -404,11 +417,11 @@ fun Multimedia(ruta: MutableState<String>){
             }
             Spacer(modifier = Modifier.width(10.dp))
             // BOTON DE FOTO
-
             Button(
                 onClick = {
                     val uri = ComposeFileProvider.getImageUri(context)
                     imageUri = uri.toString()
+                    rutaImagen.value = imageUri
                     cameraLauncher.launch(uri) },
             ) {
                 Icon(
@@ -422,7 +435,8 @@ fun Multimedia(ruta: MutableState<String>){
             Button(
                 onClick = {
                     val uri = ComposeFileProvider.getImageUri(context)
-                    imageUri = uri.toString()
+                    videoUri = uri.toString()
+                    rutaVideo.value = videoUri
                     videoLauncher.launch(uri) },
             ) {
                 Icon(

@@ -147,6 +147,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
     val currentTitulo = remember { mutableStateOf("") }
     val currentDescripcion = remember { mutableStateOf("") }
     val currentFoto = remember { mutableStateOf("") }
+    val currentVideo = remember { mutableStateOf("") }
 
     LazyColumn(
         modifier = Modifier,
@@ -196,7 +197,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
         }
 
         item {
-            Multimedia(currentFoto)
+            Multimedia(currentFoto, currentVideo)
         }
 
         item {
@@ -238,7 +239,8 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                                 id = 0,
                                 titulo = currentTitulo.value,
                                 descripcion = currentDescripcion.value,
-                                imageUri = currentFoto.value
+                                imageUri = currentFoto.value,
+                                videoUri = currentVideo.value
                             )
                         )
                         navController.popBackStack()
