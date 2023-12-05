@@ -9,17 +9,17 @@ import com.example.proyectfinal.Constants
 @Entity(tableName = Constants.TasksTable.NAME)
 data class Task(
     @PrimaryKey(autoGenerate = true) val id: Int,
-    @ColumnInfo(name = "titulo") val titulo: String,
-    @ColumnInfo(name = "descripcion") val descripcion: String,
-    @ColumnInfo(name = "fecha") val fecha: String,
-    @ColumnInfo(name = "imageUri") val imageUri: String
+    @ColumnInfo(name = Constants.TasksTable.TITLE) val titulo: String,
+    @ColumnInfo(name = Constants.TasksTable.DESC) val descripcion: String,
+    @ColumnInfo(name = Constants.TasksTable.DATE) val fecha: String,
+    @ColumnInfo(name = Constants.TasksTable.IMAGE) val imageUri: String
 )
 
 @Entity(tableName = Constants.NotesTable.NAME)
 data class Note(
     @PrimaryKey(autoGenerate = true) var id: Int,
-    @ColumnInfo(name = "titulo") val titulo: String,
-    @ColumnInfo(name = "descripcion") val descripcion: String,
-    @ColumnInfo(name = "imageUri") val imageUri: String,
-    @ColumnInfo(name = "videoUri") val videoUri: String
+    @ColumnInfo(name = Constants.NotesTable.TITLE) val titulo: String,
+    @ColumnInfo(name = Constants.NotesTable.DESC) val descripcion: String,
+    @ColumnInfo(name = Constants.NotesTable.IMAGE) val imageUri: String,
+    @ColumnInfo(name = Constants.NotesTable.VIDEO) val videoUri: String
 )

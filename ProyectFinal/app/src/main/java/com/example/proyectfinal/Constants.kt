@@ -7,8 +7,8 @@ class Constants {
 
     object General {
         const val NAME = "AppDatabase"
-        var nota = Note(0,"","", emptyList(), emptyList())
-        var tarea = Task(0, "", "", "", emptyList(), emptyList())
+        var nota = Note(0,"","", "", "")
+        var tarea = Task(0, "", "", "", "")
     }
 
 
