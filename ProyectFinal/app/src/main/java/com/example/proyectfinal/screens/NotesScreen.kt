@@ -369,11 +369,11 @@ private fun DeleteDialog(
                 openDialog.value = false
             },
             title = {
-                Text(text = "Borrar nota?")
+                Text(text = "Borrar nota", fontWeight = FontWeight.Bold)
             },
             text = {
                 Column() {
-                    Text("Vamos a eliminar esta madre?")
+                    Text("¿Desea eliminar la nota seleccionada?")
                 }
             },
             buttons = {
@@ -393,7 +393,7 @@ private fun DeleteDialog(
                                 openDialog.value = false
                             }
                         ) {
-                            Text("Simon")
+                            Text("Si", color = MaterialTheme.colorScheme.onPrimary)
                         }
                         Spacer(modifier = Modifier.padding(12.dp))
                         Button(
@@ -406,7 +406,7 @@ private fun DeleteDialog(
                                 openDialog.value = false
                             }
                         ) {
-                            Text("No")
+                            Text("No", color = MaterialTheme.colorScheme.onPrimary)
                         }
                     }
 

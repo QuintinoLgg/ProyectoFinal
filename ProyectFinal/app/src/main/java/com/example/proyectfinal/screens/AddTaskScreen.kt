@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -41,45 +40,33 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import java.util.Calendar
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
-import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.res.stringResource
 import androidx.core.app.AlarmManagerCompat
 import androidx.navigation.NavController
 import com.example.proyectfinal.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectfinal.ui.theme.MainViewModel
-import com.example.proyectfinal.data.bottomNavItems
-import com.example.proyectfinal.models.Note
 import com.example.proyectfinal.models.Task
 import com.example.proyectfinal.ui.miViewModel
 import com.example.proyectfinal.ui.theme.AndroidAudioPlayer
@@ -89,10 +76,6 @@ import com.example.proyectfinal.ui.theme.NOTIFICATION_ID
 import com.example.proyectfinal.ui.theme.NotificacionProgramada
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
 import java.io.File
-import java.time.Duration
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
 @RequiresApi(Build.VERSION_CODES.O)
@@ -166,6 +149,7 @@ private fun Content(viewModel: miViewModel, navController: NavController, naviga
 }
 
 
+@SuppressLint("UnrememberedMutableState")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController: NavController){
@@ -174,7 +158,14 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
     val currentFecha = remember { mutableStateOf("") }
     val currentFoto = remember { mutableStateOf("") }
     val currentVideo = remember { mutableStateOf("") }
+    val recordatorios = mutableStateListOf<Pair<Int,Int>>()
     val context = LocalContext.current
+
+    val idCanal = com.example.proyectfinal.ui.utils.Constants.channelId
+    
+    LaunchedEffect(Unit){
+        crearCanalNotificacion(idCanal, context)
+    }
 
     LazyColumn(
         modifier = Modifier,
@@ -208,7 +199,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
             Spacer(modifier = Modifier.height(30.dp))
         }
 
-        /*
+
         item {
             // DATETIMEPICKER PARA SELECCIONAR LA FECHA DE LA NOTA
             DatePicker(miViewModel, currentFecha)
@@ -217,14 +208,16 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
         
         item { 
             HourPicker(miViewModel)
-            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Hora seleccionada: ${miViewModel.destinyHours.value}:${miViewModel.destinyMinutes.value}")
+            Spacer(modifier = Modifier.height(20.dp))
         }
-         */
 
+
+        /*
         item {
             val opciones = listOf<String>("5 segundos","10 segundos","30 segundos","1 minuto")
             ComboBox(items = opciones, etiqueta = "Seleccionar alarmas", miViewModel = miViewModel)
-        }
+        }*/
 
         item {
             Multimedia(currentFoto, currentVideo)
@@ -273,7 +266,8 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                                 imageUri = currentFoto.value
                             )
                         )
-                        notificacionesProgramadas(context, miViewModel)
+                        val millis = conversion(miViewModel.destinyHours.value.toLong(), miViewModel.destinyMinutes.value.toLong())
+                        notificacionesProgramadas(context, millis)
                         navController.popBackStack()
                     },
                     colors = ButtonDefaults.buttonColors(
@@ -314,6 +308,20 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
 }
 
 
+private fun getCurrentTime(): Pair<Int, Int>{
+    val cal = Calendar.getInstance()
+    val hour = cal.get(Calendar.HOUR_OF_DAY)
+    val minute = cal.get(Calendar.MINUTE)
+    return Pair(hour,minute)
+}
+
+private fun conversion(hora: Long, minuto: Long): Long {
+    val dupla = getCurrentTime()
+    val millis = (((hora-dupla.first)*60) + (minuto-dupla.second)) * 60 * 1000
+    return millis
+}
+
+
 
 
 // DATETIME PICKER PERSONALIZADO
@@ -332,13 +340,13 @@ private fun DatePicker(
     val nCalendar = Calendar.getInstance()
     year = nCalendar.get(Calendar.YEAR)
     month = nCalendar.get(Calendar.MONTH)
-    month = month + 1
     day = nCalendar.get(Calendar.DAY_OF_MONTH)
 
     val nDatePickerDialog = DatePickerDialog(
         LocalContext.current,
         { _, year: Int, month: Int, day: Int ->
-            fecha = "$day/$month/$year"
+            val mes = month + 1
+            fecha = "$day/$mes/$year"
             miViewModel.setdate(fecha) // Aquí establece la fecha en el ViewModel
             miViewModel.setdestinyYears(year.toLong())
             miViewModel.setdestinyMonths(month.toLong())
@@ -403,7 +411,7 @@ private fun HourPicker(
             }
         ) {
             Column(
-                modifier = Modifier 
+                modifier = Modifier
                     .padding(16.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -411,7 +419,7 @@ private fun HourPicker(
                 TimePicker(state = timePickerState)
                 Row {
                     TextButton(
-                        onClick = { 
+                        onClick = {
                             showDialog = false
                         }
                     ) {
@@ -433,8 +441,6 @@ private fun HourPicker(
             }
         }
     }
-
-
     Button(
         onClick = {
             showDialog = true
@@ -442,7 +448,6 @@ private fun HourPicker(
     ) {
         Text(text = "Seleccionar hora")
     }
-    Text(text = miViewModel.subject.value)
 }
 
 
@@ -492,7 +497,10 @@ private fun ComboBox(items: List<String>, etiqueta: String, miViewModel: MainVie
 }
 
 
-private fun notificacionesProgramadas(context: Context, miViewModel: MainViewModel) {
+private fun notificacionesProgramadas(
+    context: Context,
+    millis: Long
+) {
     val intent = Intent(context, NotificacionProgramada::class.java)
     val pendingIntent  = PendingIntent.getBroadcast(
         context,
@@ -506,10 +514,9 @@ private fun notificacionesProgramadas(context: Context, miViewModel: MainViewMod
     AlarmManagerCompat.setExact(
         alarmManager,
         AlarmManager.RTC_WAKEUP,
-        Calendar.getInstance().timeInMillis + miViewModel.milisegundos.value,
+        Calendar.getInstance().timeInMillis + millis,
         pendingIntent
     )
-
 }
 
 private fun crearCanalNotificacion(
