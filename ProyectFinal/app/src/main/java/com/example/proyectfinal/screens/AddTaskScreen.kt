@@ -501,22 +501,28 @@ private fun notificacionesProgramadas(
     context: Context,
     millis: Long
 ) {
-    val intent = Intent(context, NotificacionProgramada::class.java)
-    val pendingIntent  = PendingIntent.getBroadcast(
-        context,
-        NOTIFICATION_ID,
-        intent,
-        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-    )
+    val intervalos = millis / 3
+    val totalNotificaciones = 3
+    val tiempoActual = System.currentTimeMillis()
 
-    var alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    // Puedes programar alarmas exactas
-    AlarmManagerCompat.setExact(
-        alarmManager,
-        AlarmManager.RTC_WAKEUP,
-        Calendar.getInstance().timeInMillis + millis,
-        pendingIntent
-    )
+    for (i in 1..totalNotificaciones) {
+        val intent = Intent(context, NotificacionProgramada::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            NOTIFICATION_ID + i, // Usar identificadores únicos para cada PendingIntent
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        // Programar una alarma con un intervalo entre notificaciones
+        AlarmManagerCompat.setExact(
+            alarmManager,
+            AlarmManager.RTC_WAKEUP,
+            tiempoActual + i * intervalos,
+            pendingIntent
+        )
+    }
 }
 
 private fun crearCanalNotificacion(
