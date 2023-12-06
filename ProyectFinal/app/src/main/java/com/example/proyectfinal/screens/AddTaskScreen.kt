@@ -329,7 +329,13 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                 Spacer(modifier = Modifier.width(10.dp))
                 // BOTON DE CANCELAR
                 Button(
-                    onClick = { navController.popBackStack() },
+                    onClick = {
+                        audioFiles.forEach { it.audioFile.delete() }
+
+                        // Reiniciar todos los datos al presionar el botón
+                        i = 0
+                        audioFiles = List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) }
+                        navController.popBackStack() },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error,
                         contentColor = MaterialTheme.colorScheme.onPrimary
