@@ -67,6 +67,7 @@ import androidx.core.app.AlarmManagerCompat
 import androidx.navigation.NavController
 import com.example.proyectfinal.R
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectfinal.data.AudioModel
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.models.Task
 import com.example.proyectfinal.ui.miViewModel
@@ -163,6 +164,16 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
     val context = LocalContext.current
 
     val idCanal = com.example.proyectfinal.ui.utils.Constants.channelId
+
+    //VARIABLES DE AUDIO
+    var i by remember {
+        mutableStateOf(0)
+    }
+
+
+    var audioFiles by remember(i) {
+        mutableStateOf(List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) })
+    }
     
     LaunchedEffect(Unit){
         crearCanalNotificacion(idCanal, context)
@@ -224,7 +235,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
             Multimedia(currentFoto, currentVideo)
         }
 
-
+        //ITEM DEL AUDIO
         item {
             // AUDIO
             val context = LocalContext.current
@@ -236,19 +247,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                 AndroidAudioPlayer(context)
             }
 
-            var i by remember {
-                mutableStateOf(0)
-            }
 
-            data class AudioModel(
-                val audioFile: File,
-                val isRecording: Boolean = false,
-                val isPlaying: Boolean = false
-            )
-
-            var audioFiles by remember(i) {
-                mutableStateOf(List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) })
-            }
 
             Column {
                 audioFiles.forEachIndexed { index, audioModel ->
@@ -292,10 +291,8 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                     )
                 }
             }
-
-
         }
-
+        //FIN DEL ITEM DEL AUDIO
 
         item {
             // BOTÓN GUARDAR Y CANCELAR
