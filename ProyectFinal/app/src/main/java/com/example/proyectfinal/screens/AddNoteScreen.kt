@@ -66,10 +66,23 @@ import com.example.proyectfinal.models.Note
 import com.example.proyectfinal.ui.miViewModel
 import com.example.proyectfinal.ui.utils.NotesAppNavigationType
 import android.content.Context
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Filter
+import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.res.painterResource
+import coil.compose.AsyncImage
 import com.example.proyectfinal.ui.theme.AndroidAudioPlayer
 import com.example.proyectfinal.ui.theme.AndroidAudioRecorder
+import com.example.proyectfinal.ui.theme.ComposeFileProvider
 import com.example.proyectfinal.ui.theme.GrabarAudioScreen
 import java.io.File
+import java.net.URI
 
 
 //Funcion para ordenar el diseño, SOLAMENTE tiene esa funcionalidad
@@ -149,11 +162,54 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
     val currentFoto = remember { mutableStateOf("") }
     val currentVideo = remember { mutableStateOf("") }
 
-    LazyColumn(
+
+    // MULTIMEDIA NUEVA ------------------------------------------------
+    val context = LocalContext.current
+    var images by remember { mutableStateOf(listOf<String>()) }
+    var uriCamara : Uri? = null
+
+    val recorder by lazy {
+        AndroidAudioRecorder(context)
+    }
+
+    val player by lazy {
+        AndroidAudioPlayer(context)
+    }
+
+    val getImageRequest = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ){uri ->
+        if(uri != null) {
+            images = images.plus(uri!!.toString() + "|IMG")
+        }
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = { success ->
+            if(success){
+                images = images.plus(uriCamara!!.toString()+"|IMG")
+            }
+        }
+    )
+
+    val videoLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CaptureVideo(),
+        onResult = { success ->
+            if(success){
+                images = images.plus(uriCamara!!.toString()+"|VID")
+            }
+        }
+    )
+
+
+    // MULTIMEDIA NUEVA ------------------------------------------------
+
+    Column(
         modifier = Modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        item{
+        //item{
             // CAJA DE TEXTO DE TITULO
             TextField(
                 value = currentTitulo.value,
@@ -165,7 +221,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
-        }
+        //}
 
         /*
         item {
@@ -182,7 +238,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
             Spacer(modifier = Modifier.height(16.dp))
         }*/
 
-        item {
+        //item {
             // CAJA DE TEXTO PARA LA DESCRIPCI[ON
             TextField(
                 value = currentDescripcion.value,
@@ -194,40 +250,45 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(30.dp))
-        }
+        //}
 
-        item {
-            Multimedia(currentFoto, currentVideo)
-        }
 
-        item {
-            // AUDIO
-            val context = LocalContext.current
-            val recorder by lazy {
-                AndroidAudioRecorder(context)
-            }
 
-            val player by lazy {
-                AndroidAudioPlayer(context)
-            }
-
-            var audioFile: File? = null
-
-            GrabarAudioScreen(
-                onClickStGra = {
-                    File(context.cacheDir, "audio.mp3").also {
-                        recorder.start(it)
-                        audioFile = it
+        //item {
+            // Multimedia(currentFoto, currentVideo)
+            Row {
+                // IMAGEN DE GALERIA
+                IconButton(
+                    onClick = {
+                        getImageRequest.launch(arrayOf("image/*"))
                     }
-                },
-                onClickSpGra = { recorder.stop() },
-                onClickStRe = { audioFile?.let { player.start(it) } },
-                onClickSpRe = { player.stop() }
-            )
-        }
+                ) {
+                    Icon(Icons.Filled.Filter, contentDescription = null)
+                }
+                // CAMARA
+                IconButton(
+                    onClick = {
+                        uriCamara = ComposeFileProvider.getImageUri(context)
+                        cameraLauncher.launch(uriCamara)
+                    }
+                ) {
+                    Icon(Icons.Filled.CameraAlt, contentDescription = null)
+                }
+                // VIDEO
+                IconButton(
+                    onClick = {
+                        val uri = ComposeFileProvider.getImageUri(context)
+                        videoLauncher.launch(uri)
+                        uriCamara = uri
+                    }
+                ) {
+                    Icon(Icons.Filled.Videocam, contentDescription = null)
+                }
+            }
+        //}
 
 
-        item {
+        //item {
             // BOTÓN GUARDAR Y CANCELAR
             Row {
                 //val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
@@ -275,12 +336,52 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(stringResource(id = R.string.cancelar))
                 }
-            }
+           // }
         }
+
+
+        //item {
+            LazyColumn {
+                itemsIndexed(images){index, uri ->
+                    ObjetoMultimedia(uri = uri, player = player)
+                }
+            }
+        //}
     }
 
 }
 
+@Composable
+private fun ObjetoMultimedia(uri: String, player: AndroidAudioPlayer) {
+    var _uri = uri.split("|")
+    if(_uri.get(1).equals("IMG")){
+        AsyncImage(
+            model = Uri.parse(_uri.get(0)),
+            contentDescription = null,
+            modifier = Modifier.size(150.dp)
+        )
+    }
+    else if(_uri.get(1).equals("VID")){
+        VideoPlayer(videoUri = Uri.parse(_uri.get(0)), modifier = Modifier.size(50.dp))
+    }
+    Spacer(modifier = Modifier.height(20.dp))
+    
+    /*
+    else if(_uri.get(1).equals("AUD")){
+        IconButton(
+            onClick = {
+                val uriString = _uri.get(0)
+                val __uri = URI(uriString)
+                val file = File(uri)
+                player.start(file)
+            }
+        ) {
+
+        }
+    }
+
+     */
+}
 
 
 /*
