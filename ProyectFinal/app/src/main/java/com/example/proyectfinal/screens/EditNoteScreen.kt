@@ -34,15 +34,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Filter
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.VideoCall
+import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.IconButton
@@ -172,183 +175,272 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
 
     val currentTitulo = remember { mutableStateOf("") }
     val currentDescripcion = remember { mutableStateOf("") }
-    val currentFoto = remember { mutableStateOf("") }
-    val currentVideo = remember { mutableStateOf("") }
+    var currentImages by remember { mutableStateOf(listOf<String>()) }
     val note = Constants.General.nota
     val context = LocalContext.current
 
-    //VARIABLES DE AUDIO
-    var i by remember {
-        mutableStateOf(0)
+    // MULTIMEDIA NUEVA ------------------------------------------------
+    var uriCamara : Uri? = null
+
+    val recorder by lazy {
+        AndroidAudioRecorder(context)
     }
-    var audioFiles by remember(i) {
-        mutableStateOf(List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) })
+
+    val player by lazy {
+        AndroidAudioPlayer(context)
     }
+
+    val getImageRequest = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ){uri ->
+        if(uri != null) {
+            currentImages = currentImages.plus(uri!!.toString() + "|JPG")
+        }
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = { success ->
+            if(success){
+                currentImages = currentImages.plus(uriCamara!!.toString()+"|JPG")
+            }
+        }
+    )
+
+    val videoLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CaptureVideo(),
+        onResult = { success ->
+            if(success){
+                currentImages = currentImages.plus(uriCamara!!.toString()+"|MP4")
+            }
+        }
+    )
+
 
     LaunchedEffect(true){
         scope.launch(Dispatchers.IO){
             currentTitulo.value = note.titulo
             currentDescripcion.value = note.descripcion
-            currentFoto.value = note.imageUri
+            if(note.images!!.isNotBlank()){
+                val urisFromString = note.images!!.split(", ").map { it }
+                currentImages = urisFromString
+            }
         }
     }
 
-    LazyColumn(
+
+    //VARIABLES DE AUDIO
+    var i by remember {
+        mutableStateOf(0)
+    }
+
+    var audioFiles by remember(i) {
+        mutableStateOf(List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) })
+    }
+    // MULTIMEDIA NUEVA ------------------------------------------------
+
+    Column(
         modifier = Modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        item{
-            // CAJA DE TEXTO DE TITULO
-            TextField(
-                value = currentTitulo.value,
-                onValueChange = { value ->
-                    currentTitulo.value = value
-                },
-                label = { Text(stringResource(id = R.string.titulo)) },
-                placeholder = { Text(stringResource(id = R.string.agregar_titulo)) },
-                modifier = Modifier.fillMaxWidth()
-            )
+        //item{
+        // CAJA DE TEXTO DE TITULO
+        TextField(
+            value = currentTitulo.value,
+            onValueChange = { value ->
+                currentTitulo.value = value
+            },
+            label = { Text(stringResource(id = R.string.titulo)) },
+            placeholder = { Text(stringResource(id = R.string.agregar_titulo)) },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        //}
+
+        /*
+        item {
+            // COMBOBOX PARA ESCOGER NOTA O TAREA
+            val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
+            ComboBox(options, stringResource(id = R.string.asunto), miViewModel)
             Spacer(modifier = Modifier.height(16.dp))
-        }
+        }*/
 
+        /*
         item {
-            // CAJA DE TEXTO PARA LA DESCRIPCI[ON
-            TextField(
-                value = currentDescripcion.value,
-                onValueChange = { value ->
-                    currentDescripcion.value = value
-                },
-                label = { Text(stringResource(id = R.string.descripcion)) },
-                placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(30.dp))
-        }
+            // DATETIMEPICKER PARA SELECCIONAR LA FECHA DE LA NOTA
+            DatePicker(miViewModel)
+            Spacer(modifier = Modifier.height(16.dp))
+        }*/
 
-        item {
-            Multimedia(currentFoto, currentVideo)
-        }
-
-        item {
-            // AUDIO
-            val context = LocalContext.current
-            val recorder by lazy {
-                AndroidAudioRecorder(context)
-            }
-
-            val player by lazy {
-                AndroidAudioPlayer(context)
-            }
+        //item {
+        // CAJA DE TEXTO PARA LA DESCRIPCI[ON
+        TextField(
+            value = currentDescripcion.value,
+            onValueChange = { value ->
+                currentDescripcion.value = value
+            },
+            label = { Text(stringResource(id = R.string.descripcion)) },
+            placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(30.dp))
+        //}
 
 
 
-            Column {
-                audioFiles.forEachIndexed { index, audioModel ->
-                    GrabarAudioScreen(
-                        onClickStGra = {
-                            val updatedAudioFiles = audioFiles.toMutableList()
-                            updatedAudioFiles[index] = audioModel.copy(isRecording = true)
-                            audioFiles = updatedAudioFiles
-
-                            recorder.start(audioModel.audioFile)
-                        },
-                        onClickSpGra = {
-                            val updatedAudioFiles = audioFiles.toMutableList()
-                            updatedAudioFiles[index] = audioModel.copy(isRecording = false)
-                            audioFiles = updatedAudioFiles
-
-                            recorder.stop()
-                        },
-                        onClickStRe = {
-                            val updatedAudioFiles = audioFiles.toMutableList()
-                            updatedAudioFiles[index] = audioModel.copy(isPlaying = true)
-                            audioFiles = updatedAudioFiles
-
-                            player.start(audioModel.audioFile)
-                        },
-                        onClickSpRe = {
-                            val updatedAudioFiles = audioFiles.toMutableList()
-                            updatedAudioFiles[index] = audioModel.copy(isPlaying = false)
-                            audioFiles = updatedAudioFiles
-
-                            player.stop()
-                        }
-                    )
+        //item {
+        // Multimedia(currentFoto, currentVideo)
+        Row {
+            // IMAGEN DE GALERIA
+            IconButton(
+                onClick = {
+                    getImageRequest.launch(arrayOf("image/*"))
                 }
-
-                Button(onClick = { ++i }) {
-                    Icon(
-                        Icons.Filled.AddCircle,
-                        contentDescription = "Más",
-                        modifier = Modifier.size(25.dp)
-                    )
+            ) {
+                Icon(Icons.Filled.Filter, contentDescription = null)
+            }
+            // CAMARA
+            IconButton(
+                onClick = {
+                    uriCamara = ComposeFileProvider.getImageUri(context)
+                    cameraLauncher.launch(uriCamara)
                 }
+            ) {
+                Icon(Icons.Filled.CameraAlt, contentDescription = null)
             }
-        }
-
-        item{
-            // Mostrar la imagen seleccionada
-            if (currentFoto.value.isNotEmpty()) {
-                Image(
-                    painter = rememberImagePainter(data = currentFoto.value),
-                    contentDescription = "Selected Image",
-                    modifier = Modifier
-                        .size(300.dp)
-                        .padding(16.dp)
-                )
+            // VIDEO
+            IconButton(
+                onClick = {
+                    val uri = ComposeFileProvider.getImageUri(context)
+                    videoLauncher.launch(uri)
+                    uriCamara = uri
+                }
+            ) {
+                Icon(Icons.Filled.Videocam, contentDescription = null)
             }
-        }
 
-        item {
-            // BOTÓN GUARDAR Y CANCELAR
-            Row {
-                //val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
-                // BOTON DE GUARDAR
-                Button(
-                    onClick = {
-                        viewModel.updateNote(
-                            Note(
-                                id = note.id,
-                                titulo = currentTitulo.value,
-                                descripcion = currentDescripcion.value,
-                                imageUri = currentFoto.value,
-                                videoUri = currentVideo.value
-                            )
+        }
+        //}
+
+
+        Row {
+            //val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
+            // BOTON DE GUARDAR
+            Button(
+                onClick = {
+                    viewModel.updateNote(
+                        Note(
+                            id = 0,
+                            titulo = currentTitulo.value,
+                            descripcion = currentDescripcion.value,
+                            images = currentImages.joinToString()
                         )
-                        navController.popBackStack()
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceTint,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
                     )
-                ) {
-                    Icon(
-                        Icons.Default.Check,
-                        contentDescription = "Guardar",
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(stringResource(id = R.string.guardar))
+                    navController.popBackStack()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceTint,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Icon(
+                    Icons.Default.Check,
+                    contentDescription = "Guardar",
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(stringResource(id = R.string.guardar))
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            // BOTON DE CANCELAR
+            Button(
+                onClick = {
+                    audioFiles.forEach { it.audioFile.delete() }
+
+                    // Reiniciar todos los datos al presionar el botón
+                    i = 0
+                    audioFiles = List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) }
+                    navController.popBackStack() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Icon(
+                    Icons.Default.Clear,
+                    contentDescription = "Cancelar",
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(stringResource(id = R.string.cancelar))
+            }
+            // }
+        }
+
+        LazyColumn {
+            itemsIndexed(currentImages){index, uri ->
+                ObjetoMultimedia(uri = uri, player = player)
+            }
+
+            item {
+                // AUDIO
+                val context = LocalContext.current
+                val recorder by lazy {
+                    AndroidAudioRecorder(context)
                 }
-                Spacer(modifier = Modifier.width(10.dp))
-                // BOTON DE CANCELAR
-                Button(
-                    onClick = { navController.popBackStack() },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                ) {
-                    Icon(
-                        Icons.Default.Clear,
-                        contentDescription = "Cancelar",
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(stringResource(id = R.string.cancelar))
+
+                val player by lazy {
+                    AndroidAudioPlayer(context)
+                }
+
+
+
+                Column {
+                    audioFiles.forEachIndexed { index, audioModel ->
+                        GrabarAudioScreen(
+                            onClickStGra = {
+                                val updatedAudioFiles = audioFiles.toMutableList()
+                                updatedAudioFiles[index] = audioModel.copy(isRecording = true)
+                                audioFiles = updatedAudioFiles
+
+                                recorder.start(audioModel.audioFile)
+                            },
+                            onClickSpGra = {
+                                val updatedAudioFiles = audioFiles.toMutableList()
+                                updatedAudioFiles[index] = audioModel.copy(isRecording = false)
+                                audioFiles = updatedAudioFiles
+
+                                recorder.stop()
+                            },
+                            onClickStRe = {
+                                val updatedAudioFiles = audioFiles.toMutableList()
+                                updatedAudioFiles[index] = audioModel.copy(isPlaying = true)
+                                audioFiles = updatedAudioFiles
+
+                                player.start(audioModel.audioFile)
+                            },
+                            onClickSpRe = {
+                                val updatedAudioFiles = audioFiles.toMutableList()
+                                updatedAudioFiles[index] = audioModel.copy(isPlaying = false)
+                                audioFiles = updatedAudioFiles
+
+                                player.stop()
+                            }
+                        )
+                    }
+
+                    Button(onClick = { ++i }) {
+                        Icon(
+                            Icons.Filled.AddCircle,
+                            contentDescription = "Más",
+                            modifier = Modifier.size(25.dp)
+                        )
+                    }
                 }
             }
         }
+        //item {
+        // BOTÓN GUARDAR Y CANCELAR
 
 
     }

@@ -20,6 +20,5 @@ data class Note(
     @PrimaryKey(autoGenerate = true) var id: Int,
     @ColumnInfo(name = Constants.NotesTable.TITLE) val titulo: String,
     @ColumnInfo(name = Constants.NotesTable.DESC) val descripcion: String,
-    @ColumnInfo(name = Constants.NotesTable.IMAGE) val imageUri: String,
-    @ColumnInfo(name = Constants.NotesTable.VIDEO) val videoUri: String
+    @ColumnInfo(name = Constants.NotesTable.IMAGE) val images: String? = null,
 )
