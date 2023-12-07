@@ -296,6 +296,61 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                     Icon(Icons.Filled.Videocam, contentDescription = null)
                 }
             }
+
+        // BOTÓN GUARDAR Y CANCELAR
+        Row {
+            //val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
+            // BOTON DE GUARDAR
+            Button(
+                onClick = {
+                    viewModel.insertNote(
+                        Note(
+                            id = 0,
+                            titulo = currentTitulo.value,
+                            descripcion = currentDescripcion.value,
+                            images = images.joinToString()
+                        )
+                    )
+                    navController.popBackStack()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceTint,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Icon(
+                    Icons.Default.Check,
+                    contentDescription = "Guardar",
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(stringResource(id = R.string.guardar))
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            // BOTON DE CANCELAR
+            Button(
+                onClick = {
+                    audioFiles.forEach { it.audioFile.delete() }
+
+                    // Reiniciar todos los datos al presionar el botón
+                    i = 0
+                    audioFiles = List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) }
+                    navController.popBackStack() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Icon(
+                    Icons.Default.Clear,
+                    contentDescription = "Cancelar",
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(stringResource(id = R.string.cancelar))
+            }
+            // }
+        }
         //}
 
 
@@ -364,60 +419,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
             }
         }
         //item {
-            // BOTÓN GUARDAR Y CANCELAR
-        Row {
-            //val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
-            // BOTON DE GUARDAR
-            Button(
-                onClick = {
-                    viewModel.insertNote(
-                        Note(
-                            id = 0,
-                            titulo = currentTitulo.value,
-                            descripcion = currentDescripcion.value,
-                            images = images.joinToString()
-                        )
-                    )
-                    navController.popBackStack()
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceTint,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
-                Icon(
-                    Icons.Default.Check,
-                    contentDescription = "Guardar",
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(stringResource(id = R.string.guardar))
-            }
-            Spacer(modifier = Modifier.width(10.dp))
-            // BOTON DE CANCELAR
-            Button(
-                onClick = {
-                    audioFiles.forEach { it.audioFile.delete() }
 
-                    // Reiniciar todos los datos al presionar el botón
-                    i = 0
-                    audioFiles = List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) }
-                    navController.popBackStack() },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
-                Icon(
-                    Icons.Default.Clear,
-                    contentDescription = "Cancelar",
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(stringResource(id = R.string.cancelar))
-            }
-            // }
-        }
 
     }
 
@@ -438,21 +440,6 @@ fun ObjetoMultimedia(uri: String, player: AndroidAudioPlayer) {
     }
     Spacer(modifier = Modifier.height(20.dp))
 
-    /*
-    else if(_uri.get(1).equals("AUD")){
-        IconButton(
-            onClick = {
-                val uriString = _uri.get(0)
-                val __uri = URI(uriString)
-                val file = File(uri)
-                player.start(file)
-            }
-        ) {
-
-        }
-    }
-
-     */
 }
 
 
