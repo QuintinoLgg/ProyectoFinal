@@ -7,7 +7,10 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,10 +47,15 @@ import androidx.compose.ui.unit.dp
 import java.util.Calendar
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Filter
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -73,6 +81,7 @@ import com.example.proyectfinal.models.Task
 import com.example.proyectfinal.ui.miViewModel
 import com.example.proyectfinal.ui.theme.AndroidAudioPlayer
 import com.example.proyectfinal.ui.theme.AndroidAudioRecorder
+import com.example.proyectfinal.ui.theme.ComposeFileProvider
 import com.example.proyectfinal.ui.theme.GrabarAudioScreen
 import com.example.proyectfinal.ui.theme.NOTIFICATION_ID
 import com.example.proyectfinal.ui.theme.NotificacionProgramada
@@ -155,208 +164,268 @@ private fun Content(viewModel: miViewModel, navController: NavController, naviga
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController: NavController){
-    val currentTitulo = remember { mutableStateOf("") }
-    val currentDescripcion = remember { mutableStateOf("") }
-    val currentFecha = remember { mutableStateOf("") }
-    val currentFoto = remember { mutableStateOf("") }
-    val currentVideo = remember { mutableStateOf("") }
-    val recordatorios = mutableStateListOf<Pair<Int,Int>>()
-    val context = LocalContext.current
+    // VARIABLES
+    val context = LocalContext.current                                // Variable que guarda el contexto
+    val currentTitulo = remember { mutableStateOf("") }         // Variable que guarda el titulo
+    val currentDescripcion = remember { mutableStateOf("") }    // Variable que guarda la descripcion
+    val currentFecha = remember { mutableStateOf("") }          // Variable que guarda la fecha de la tarea
+    var images by remember { mutableStateOf(listOf<String>()) }       // Variable que guarda las Uri's de las imagenes y videos
+    var uriCamara : Uri? = null                                     // Variable que guarda la Uri de la foto que se tome con la camara
 
+    val player by lazy {                // Variable usada para el reproductor de audio
+        AndroidAudioPlayer(context)
+    }
+
+    // Variable que crea el canal de notificaciones
     val idCanal = com.example.proyectfinal.ui.utils.Constants.channelId
 
-    //VARIABLES DE AUDIO
+    // Variable de audio
     var i by remember {
         mutableStateOf(0)
     }
 
-
+    // Variable que guarda los archivos de audio
     var audioFiles by remember(i) {
         mutableStateOf(List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) })
     }
-    
+
+    // Creacion del canal de notificacion
     LaunchedEffect(Unit){
         crearCanalNotificacion(idCanal, context)
     }
 
-    LazyColumn(
+    // Variable usada para tomar imagen de la galeria o documentos
+    val getImageRequest = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ){uri ->
+        if(uri != null) {
+            images = images.plus(uri!!.toString() + "|IMG")
+        }
+    }
+
+    // Variable usada para tomar una fotografia con la camara nativa del telefono
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = { success ->
+            if(success){
+                images = images.plus(uriCamara!!.toString()+"|IMG")
+            }
+        }
+    )
+
+    // Variable usada para poder lanzar la grabadora de video
+    val videoLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CaptureVideo(),
+        onResult = { success ->
+            if(success){
+                images = images.plus(uriCamara!!.toString()+"|VID")
+            }
+        }
+    )
+
+
+    //- --------------------------------------------------------------------------------------
+
+
+    Column(
         modifier = Modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        item{
-            // CAJA DE TEXTO DE TITULO
-            TextField(
-                value = currentTitulo.value,
-                onValueChange = { value ->
-                    currentTitulo.value = value
-                },
-                label = { Text(stringResource(id = R.string.titulo)) },
-                placeholder = { Text(stringResource(id = R.string.agregar_titulo)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        item {
-            // CAJA DE TEXTO PARA LA DESCRIPCI[ON
-            TextField(
-                value = currentDescripcion.value,
-                onValueChange = { value ->
-                    currentDescripcion.value = value
-                },
-                label = { Text(stringResource(id = R.string.descripcion)) },
-                placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(30.dp))
-        }
+        // CAJA DE TEXTO DE TITULO
+        TextField(
+            value = currentTitulo.value,
+            onValueChange = { value ->
+                currentTitulo.value = value
+            },
+            label = { Text(stringResource(id = R.string.titulo)) },
+            placeholder = { Text(stringResource(id = R.string.agregar_titulo)) },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
 
 
-        item {
-            // DATETIMEPICKER PARA SELECCIONAR LA FECHA DE LA NOTA
-            DatePicker(miViewModel, currentFecha)
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-        
-        item { 
-            HourPicker(miViewModel)
-            Text(text = "Hora seleccionada: ${miViewModel.destinyHours.value}:${miViewModel.destinyMinutes.value}")
-            Spacer(modifier = Modifier.height(20.dp))
-        }
+        // CAJA DE TEXTO PARA LA DESCRIPCI[ON
+        TextField(
+            value = currentDescripcion.value,
+            onValueChange = { value ->
+                currentDescripcion.value = value
+            },
+            label = { Text(stringResource(id = R.string.descripcion)) },
+            placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(30.dp))
 
+        // DATETIMEPICKER PARA SELECCIONAR LA FECHA DE LA NOTA
+        DatePicker(miViewModel, currentFecha)
+        Spacer(modifier = Modifier.height(16.dp))
 
-        /*
-        item {
-            val opciones = listOf<String>("5 segundos","10 segundos","30 segundos","1 minuto")
-            ComboBox(items = opciones, etiqueta = "Seleccionar alarmas", miViewModel = miViewModel)
-        }*/
+        HourPicker(miViewModel)
+        Text(text = "Hora seleccionada: ${miViewModel.destinyHours.value}:${miViewModel.destinyMinutes.value}")
+        Spacer(modifier = Modifier.height(20.dp))
 
-        item {
-            Multimedia(currentFoto, currentVideo)
-        }
-
-        //ITEM DEL AUDIO
-        item {
-            // AUDIO
-            val context = LocalContext.current
-            val recorder by lazy {
-                AndroidAudioRecorder(context)
-            }
-
-            val player by lazy {
-                AndroidAudioPlayer(context)
-            }
-
-
-
-            Column {
-                audioFiles.forEachIndexed { index, audioModel ->
-                    GrabarAudioScreen(
-                        onClickStGra = {
-                            val updatedAudioFiles = audioFiles.toMutableList()
-                            updatedAudioFiles[index] = audioModel.copy(isRecording = true)
-                            audioFiles = updatedAudioFiles
-
-                            recorder.start(audioModel.audioFile)
-                        },
-                        onClickSpGra = {
-                            val updatedAudioFiles = audioFiles.toMutableList()
-                            updatedAudioFiles[index] = audioModel.copy(isRecording = false)
-                            audioFiles = updatedAudioFiles
-
-                            recorder.stop()
-                        },
-                        onClickStRe = {
-                            val updatedAudioFiles = audioFiles.toMutableList()
-                            updatedAudioFiles[index] = audioModel.copy(isPlaying = true)
-                            audioFiles = updatedAudioFiles
-
-                            player.start(audioModel.audioFile)
-                        },
-                        onClickSpRe = {
-                            val updatedAudioFiles = audioFiles.toMutableList()
-                            updatedAudioFiles[index] = audioModel.copy(isPlaying = false)
-                            audioFiles = updatedAudioFiles
-
-                            player.stop()
-                        }
-                    )
+        // Botones de multimedia
+        Row {
+            // Tomar imagen de galeria
+            TextButton(
+                onClick = {
+                    getImageRequest.launch(arrayOf("image/*"))
                 }
-
-                Button(onClick = { ++i }) {
-                    Icon(
-                        Icons.Filled.AddCircle,
-                        contentDescription = "Más",
-                        modifier = Modifier.size(25.dp)
-                    )
+            ) {
+                Icon(Icons.Default.Filter, contentDescription = null)
+                Text("Galeria")
+            }
+            // Tomar imagen con la camara
+            TextButton(
+                onClick = {
+                    uriCamara = ComposeFileProvider.getImageUri(context)
+                    cameraLauncher.launch(uriCamara)
                 }
+            ) {
+                Icon(Icons.Default.CameraAlt, contentDescription = null)
+                Text("Camara")
+            }
+            // Tomar video
+            TextButton(
+                onClick = {
+                    val uri = ComposeFileProvider.getImageUri(context)
+                    videoLauncher.launch(uri)
+                    uriCamara = uri
+                }
+            ) {
+                Icon(Icons.Default.Videocam, contentDescription = null)
+                Text("Video")
             }
         }
-        //FIN DEL ITEM DEL AUDIO
 
-        item {
-            // BOTÓN GUARDAR Y CANCELAR
-            Row {
-                //val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
-                // BOTON DE GUARDAR
-                Button(
-                    onClick = {
-                        viewModel.insertTask(
-                            Task(
-                                id=0,
-                                titulo = currentTitulo.value,
-                                descripcion = currentDescripcion.value, fecha = currentFecha.value,
-                                imageUri = currentFoto.value
-                            )
+
+        // BOTÓN GUARDAR Y CANCELAR
+        Row {
+            //val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
+            // BOTON DE GUARDAR
+            Button(
+                onClick = {
+                    viewModel.insertTask(
+                        Task(
+                            id=0,
+                            titulo = currentTitulo.value,
+                            descripcion = currentDescripcion.value, fecha = currentFecha.value,
+                            images = images.joinToString()
                         )
-                        val millis = conversion(miViewModel.destinyHours.value.toLong(), miViewModel.destinyMinutes.value.toLong())
-                        notificacionesProgramadas(context, millis)
-                        navController.popBackStack()
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceTint,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
                     )
-                ) {
-                    Icon(
-                        Icons.Default.Check,
-                        contentDescription = "Guardar",
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(stringResource(id = R.string.guardar))
-                }
-                Spacer(modifier = Modifier.width(10.dp))
-                // BOTON DE CANCELAR
-                Button(
-                    onClick = {
-                        audioFiles.forEach { it.audioFile.delete() }
+                    val millis = conversion(miViewModel.destinyHours.value.toLong(), miViewModel.destinyMinutes.value.toLong())
+                    notificacionesProgramadas(context, millis)
+                    navController.popBackStack()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceTint,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Icon(
+                    Icons.Default.Check,
+                    contentDescription = "Guardar",
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(stringResource(id = R.string.guardar))
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            // BOTON DE CANCELAR
+            Button(
+                onClick = {
+                    audioFiles.forEach { it.audioFile.delete() }
 
-                        // Reiniciar todos los datos al presionar el botón
-                        i = 0
-                        audioFiles = List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) }
-                        navController.popBackStack() },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                ) {
-                    Icon(
-                        Icons.Default.Clear,
-                        contentDescription = "Cancelar",
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(stringResource(id = R.string.cancelar))
+                    // Reiniciar todos los datos al presionar el botón
+                    i = 0
+                    audioFiles = List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) }
+                    navController.popBackStack() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Icon(
+                    Icons.Default.Clear,
+                    contentDescription = "Cancelar",
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(stringResource(id = R.string.cancelar))
+            }
+        }
+
+
+
+
+        LazyColumn{
+            itemsIndexed(images){index, uri ->
+                ObjetoMultimedia(uri = uri, player = player)
+            }
+
+            item{
+                // Audio
+                val context = LocalContext.current
+                val recorder by lazy {
+                    AndroidAudioRecorder(context)
+                }
+
+                val player by lazy {
+                    AndroidAudioPlayer(context)
+                }
+
+                Column {
+                    audioFiles.forEachIndexed { index, audioModel ->
+                        GrabarAudioScreen(
+                            onClickStGra = {
+                                val updatedAudioFiles = audioFiles.toMutableList()
+                                updatedAudioFiles[index] = audioModel.copy(isRecording = true)
+                                audioFiles = updatedAudioFiles
+
+                                recorder.start(audioModel.audioFile)
+                            },
+                            onClickSpGra = {
+                                val updatedAudioFiles = audioFiles.toMutableList()
+                                updatedAudioFiles[index] = audioModel.copy(isRecording = false)
+                                audioFiles = updatedAudioFiles
+
+                                recorder.stop()
+                            },
+                            onClickStRe = {
+                                val updatedAudioFiles = audioFiles.toMutableList()
+                                updatedAudioFiles[index] = audioModel.copy(isPlaying = true)
+                                audioFiles = updatedAudioFiles
+
+                                player.start(audioModel.audioFile)
+                            },
+                            onClickSpRe = {
+                                val updatedAudioFiles = audioFiles.toMutableList()
+                                updatedAudioFiles[index] = audioModel.copy(isPlaying = false)
+                                audioFiles = updatedAudioFiles
+
+                                player.stop()
+                            }
+                        )
+                    }
+
+                    // Agregar nota de voz
+                    TextButton(
+                        onClick = {
+                            ++i
+                        }
+                    ) {
+                        Icon(Icons.Default.Mic, contentDescription = null)
+                        Text("Audio")
+                    }
                 }
             }
-            //Text(text = "${miViewModel.milisegundos.value}")
         }
     }
 
 }
 
 
+// Funcion que toma el tiempo actual
 private fun getCurrentTime(): Pair<Int, Int>{
     val cal = Calendar.getInstance()
     val hour = cal.get(Calendar.HOUR_OF_DAY)
@@ -364,6 +433,9 @@ private fun getCurrentTime(): Pair<Int, Int>{
     return Pair(hour,minute)
 }
 
+
+// Funcion que convierte una hora en formao HH:MM a milisegundos
+// Tomando como punto de partida el punto actual
 private fun conversion(hora: Long, minuto: Long): Long {
     val dupla = getCurrentTime()
     val millis = (((hora-dupla.first)*60) + (minuto-dupla.second)) * 60 * 1000
@@ -371,9 +443,7 @@ private fun conversion(hora: Long, minuto: Long): Long {
 }
 
 
-
-
-// DATETIME PICKER PERSONALIZADO
+// Composable que funciona como un DateTimePicker que toma la fecha en formato dd/MM/AAAA
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DatePicker(
@@ -424,10 +494,12 @@ private fun DatePicker(
     )
 }
 
+
+// Composable que toma la hora en formato HH:MM
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun HourPicker(
+fun HourPicker(
     miViewModel: MainViewModel
 ){
     var selectedHour by remember {
@@ -500,6 +572,7 @@ private fun HourPicker(
 }
 
 
+//
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ComboBox(items: List<String>, etiqueta: String, miViewModel: MainViewModel) {

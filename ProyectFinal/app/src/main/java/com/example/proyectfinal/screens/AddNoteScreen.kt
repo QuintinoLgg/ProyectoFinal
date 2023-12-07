@@ -74,15 +74,23 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Filter
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
 import com.example.proyectfinal.data.AudioModel
 import com.example.proyectfinal.ui.theme.AndroidAudioPlayer
 import com.example.proyectfinal.ui.theme.AndroidAudioRecorder
 import com.example.proyectfinal.ui.theme.ComposeFileProvider
 import com.example.proyectfinal.ui.theme.GrabarAudioScreen
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ui.PlayerView
 import java.io.File
 import java.net.URI
 
@@ -159,25 +167,28 @@ private fun Content(viewModel: miViewModel, navController: NavController, naviga
 
 @Composable
 private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController: NavController){
-    val currentTitulo = remember { mutableStateOf("") }
-    val currentDescripcion = remember { mutableStateOf("") }
-    val currentFoto = remember { mutableStateOf("") }
-    val currentVideo = remember { mutableStateOf("") }
+    // VARIABLES
+    val context = LocalContext.current                                // Variable que guarda el contexto
+    val currentTitulo = remember { mutableStateOf("") }         // Variable que guarda el titulo
+    val currentDescripcion = remember { mutableStateOf("") }    // Variable que guarda la descripcion
+    var images by remember { mutableStateOf(listOf<String>()) }       // Variable que guarda las Uri's de las imagenes y videos
+    var uriCamara : Uri? = null         // Variable que guarda la Uri de la foto que se tome con la camara
 
-
-    // MULTIMEDIA NUEVA ------------------------------------------------
-    val context = LocalContext.current
-    var images by remember { mutableStateOf(listOf<String>()) }
-    var uriCamara : Uri? = null
-
-    val recorder by lazy {
-        AndroidAudioRecorder(context)
-    }
-
-    val player by lazy {
+    val player by lazy {                // Variable usada para el reproductor de audio
         AndroidAudioPlayer(context)
     }
 
+    // Variable de audio
+    var i by remember {
+        mutableStateOf(0)
+    }
+
+    // Variable que guarda los archivos de audio
+    var audioFiles by remember(i) {
+        mutableStateOf(List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) })
+    }
+
+    // Variable usada para tomar imagen de la galeria o documentos
     val getImageRequest = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ){uri ->
@@ -186,6 +197,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
         }
     }
 
+    // Variable usada para tomar una fotografia con la camara nativa del telefono
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
         onResult = { success ->
@@ -195,6 +207,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
         }
     )
 
+    // Variable usada para poder lanzar la grabadora de video
     val videoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CaptureVideo(),
         onResult = { success ->
@@ -205,102 +218,72 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
     )
 
 
-    //VARIABLES DE AUDIO
-    var i by remember {
-        mutableStateOf(0)
-    }
-
-
-    var audioFiles by remember(i) {
-        mutableStateOf(List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) })
-    }
-    // MULTIMEDIA NUEVA ------------------------------------------------
-
+    // Columna que va trazando los elementos compose
     Column(
         modifier = Modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        //item{
-            // CAJA DE TEXTO DE TITULO
-            TextField(
-                value = currentTitulo.value,
-                onValueChange = { value ->
-                    currentTitulo.value = value
-                },
-                label = { Text(stringResource(id = R.string.titulo)) },
-                placeholder = { Text(stringResource(id = R.string.agregar_titulo)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        //}
+        // Campo de texto para el titulo
+        TextField(
+            value = currentTitulo.value,
+            onValueChange = { value ->
+                currentTitulo.value = value
+            },
+            label = { Text(stringResource(id = R.string.titulo)) },
+            placeholder = { Text(stringResource(id = R.string.agregar_titulo)) },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
 
-        /*
-        item {
-            // COMBOBOX PARA ESCOGER NOTA O TAREA
-            val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
-            ComboBox(options, stringResource(id = R.string.asunto), miViewModel)
-            Spacer(modifier = Modifier.height(16.dp))
-        }*/
+        // Campo de texto para la descripcion
+        TextField(
+            value = currentDescripcion.value,
+            onValueChange = { value ->
+                currentDescripcion.value = value
+            },
+            label = { Text(stringResource(id = R.string.descripcion)) },
+            placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(30.dp))
 
-        /*
-        item {
-            // DATETIMEPICKER PARA SELECCIONAR LA FECHA DE LA NOTA
-            DatePicker(miViewModel)
-            Spacer(modifier = Modifier.height(16.dp))
-        }*/
-
-        //item {
-            // CAJA DE TEXTO PARA LA DESCRIPCI[ON
-            TextField(
-                value = currentDescripcion.value,
-                onValueChange = { value ->
-                    currentDescripcion.value = value
-                },
-                label = { Text(stringResource(id = R.string.descripcion)) },
-                placeholder = { Text(stringResource(id = R.string.agregar_descripcion)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(30.dp))
-        //}
-
-
-
-        //item {
-            // Multimedia(currentFoto, currentVideo)
-            Row {
-                // IMAGEN DE GALERIA
-                IconButton(
-                    onClick = {
-                        getImageRequest.launch(arrayOf("image/*"))
-                    }
-                ) {
-                    Icon(Icons.Filled.Filter, contentDescription = null)
-                }
-                // CAMARA
-                IconButton(
-                    onClick = {
-                        uriCamara = ComposeFileProvider.getImageUri(context)
-                        cameraLauncher.launch(uriCamara)
-                    }
-                ) {
-                    Icon(Icons.Filled.CameraAlt, contentDescription = null)
-                }
-                // VIDEO
-                IconButton(
-                    onClick = {
-                        val uri = ComposeFileProvider.getImageUri(context)
-                        videoLauncher.launch(uri)
-                        uriCamara = uri
-                    }
-                ) {
-                    Icon(Icons.Filled.Videocam, contentDescription = null)
-                }
-            }
-
-        // BOTÓN GUARDAR Y CANCELAR
+        // Botones de multimedia
         Row {
-            //val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
-            // BOTON DE GUARDAR
+            // Tomar imagen de galeria
+            TextButton(
+                onClick = {
+                    getImageRequest.launch(arrayOf("image/*"))
+                }
+            ) {
+                Icon(Icons.Default.Filter, contentDescription = null)
+                Text("Galeria")
+            }
+            // Tomar imagen con la camara
+            TextButton(
+                onClick = {
+                    uriCamara = ComposeFileProvider.getImageUri(context)
+                    cameraLauncher.launch(uriCamara)
+                }
+            ) {
+                Icon(Icons.Default.CameraAlt, contentDescription = null)
+                Text("Camara")
+            }
+            // Tomar video
+            TextButton(
+                onClick = {
+                    val uri = ComposeFileProvider.getImageUri(context)
+                    videoLauncher.launch(uri)
+                    uriCamara = uri
+                }
+            ) {
+                Icon(Icons.Default.Videocam, contentDescription = null)
+                Text("Video")
+            }
+        }
+
+        // Boton de guardar y cancelar
+        Row {
+            // Boton de guardar
             Button(
                 onClick = {
                     viewModel.insertNote(
@@ -327,11 +310,10 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                 Text(stringResource(id = R.string.guardar))
             }
             Spacer(modifier = Modifier.width(10.dp))
-            // BOTON DE CANCELAR
+            // Boton de cancelar
             Button(
                 onClick = {
                     audioFiles.forEach { it.audioFile.delete() }
-
                     // Reiniciar todos los datos al presionar el botón
                     i = 0
                     audioFiles = List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) }
@@ -349,20 +331,17 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(stringResource(id = R.string.cancelar))
             }
-            // }
         }
-        //}
 
 
-
-
+        // Lazy column para mostrar el contenido multimedia
         LazyColumn {
             itemsIndexed(images){index, uri ->
                 ObjetoMultimedia(uri = uri, player = player)
             }
 
             item {
-                // AUDIO
+                // Audio
                 val context = LocalContext.current
                 val recorder by lazy {
                     AndroidAudioRecorder(context)
@@ -372,8 +351,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                     AndroidAudioPlayer(context)
                 }
 
-
-
+                // Mostrar los audios y sus botones
                 Column {
                     audioFiles.forEachIndexed { index, audioModel ->
                         GrabarAudioScreen(
@@ -381,50 +359,49 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                                 val updatedAudioFiles = audioFiles.toMutableList()
                                 updatedAudioFiles[index] = audioModel.copy(isRecording = true)
                                 audioFiles = updatedAudioFiles
-
                                 recorder.start(audioModel.audioFile)
                             },
                             onClickSpGra = {
                                 val updatedAudioFiles = audioFiles.toMutableList()
                                 updatedAudioFiles[index] = audioModel.copy(isRecording = false)
                                 audioFiles = updatedAudioFiles
-
                                 recorder.stop()
                             },
                             onClickStRe = {
                                 val updatedAudioFiles = audioFiles.toMutableList()
                                 updatedAudioFiles[index] = audioModel.copy(isPlaying = true)
                                 audioFiles = updatedAudioFiles
-
                                 player.start(audioModel.audioFile)
                             },
                             onClickSpRe = {
                                 val updatedAudioFiles = audioFiles.toMutableList()
                                 updatedAudioFiles[index] = audioModel.copy(isPlaying = false)
                                 audioFiles = updatedAudioFiles
-
                                 player.stop()
                             }
                         )
                     }
-
-                    Button(onClick = { ++i }) {
-                        Icon(
-                            Icons.Filled.AddCircle,
-                            contentDescription = "Más",
-                            modifier = Modifier.size(25.dp)
-                        )
+                    // Agregar nota de voz
+                    TextButton(
+                        onClick = {
+                            ++i
+                        }
+                    ) {
+                        Icon(Icons.Default.Mic, contentDescription = null)
+                        Text("Audio")
                     }
+
                 }
             }
         }
-        //item {
-
 
     }
 
 }
 
+
+// Composable que muestra una AsyncImage si es fotografia
+// y que muestra un VideoPlayer si es video
 @Composable
 fun ObjetoMultimedia(uri: String, player: AndroidAudioPlayer) {
     var _uri = uri.split("|")
@@ -439,97 +416,54 @@ fun ObjetoMultimedia(uri: String, player: AndroidAudioPlayer) {
         VideoPlayer(videoUri = Uri.parse(_uri.get(0)), modifier = Modifier.size(50.dp))
     }
     Spacer(modifier = Modifier.height(20.dp))
-
 }
 
 
-/*
-// DATETIME PICKER PERSONALIZADO
-@OptIn(ExperimentalMaterial3Api::class)
+// Composable que renderiza video
 @Composable
-fun DatePicker(miViewModel: MainViewModel){
-    var fecha by rememberSaveable {
-        mutableStateOf("")
-    }
-    val year: Int
-    val month: Int
-    val day: Int
-    val nCalendar = Calendar.getInstance()
-    year = nCalendar.get(Calendar.YEAR)
-    month = nCalendar.get(Calendar.MONTH)
-    day = nCalendar.get(Calendar.DAY_OF_MONTH)
-
-    val nDatePickerDialog = DatePickerDialog(
-        LocalContext.current,
-        { _, year: Int, month: Int, day: Int ->
-            fecha = "$day/$month/$year"
-            miViewModel.setdate(fecha) // Aquí establece la fecha en el ViewModel
-        },
-        year, month, day
-    )
-
-    TextField(
-        value = miViewModel.date.value,
-        onValueChange = { newDate ->
-            miViewModel.setdate(newDate)
-        },
-        readOnly = true,
-        label = { Text(stringResource(id = R.string.fecha)) },
-        placeholder = { Text(stringResource(id = R.string.selecciona_fecha)) },
-        leadingIcon = {
-            Icon(
-                Icons.Default.DateRange,
-                contentDescription = null,
-                modifier = Modifier.clickable { nDatePickerDialog.show() }
-            )
+fun VideoPlayer(videoUri: Uri, modifier: Modifier = Modifier.fillMaxWidth()) {
+    val context = LocalContext.current
+    val exoPlayer = remember {
+        SimpleExoPlayer.Builder(context).build().apply {
+            setMediaItem(MediaItem.fromUri(videoUri))
+            prepare()
         }
-    )
-}
+    }
+    val playbackState = exoPlayer
+    val isPlaying = playbackState?.isPlaying ?: false
 
- */
-
-/*
-// COMBOBOX PERSONALIZADO
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ComboBox(items: List<String>, etiqueta: String, miViewModel: MainViewModel) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf(items[0]) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = {expanded = !expanded},
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        TextField(
-            modifier = Modifier.menuAnchor().fillMaxWidth(),
-            readOnly = true,
-            value = miViewModel.subject.value,
-            onValueChange = {},
-            label = { Text(etiqueta) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            items.forEach { item ->
-                DropdownMenuItem(
-                    text = { Text(text = item) },
-                    onClick = {
-                        miViewModel.subject.value = item
-                        expanded = false
-                    },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                    modifier = Modifier.fillMaxWidth()
-                )
+    AndroidView(
+        factory = { context ->
+            PlayerView(context).apply {
+                player = exoPlayer
             }
-        }
+        },
+        modifier = Modifier
+            .fillMaxWidth(0.8f)
+            .height(200.dp),
+    )
+
+    IconButton(
+        onClick = {
+            if (isPlaying) {
+                exoPlayer.pause()
+            } else {
+                exoPlayer.play()
+            }
+        },
+        modifier = Modifier
+            //.align(Alignment.BottomEnd)
+            .padding(16.dp)
+    ) {
+        Icon(
+            imageVector = if (isPlaying) Icons.Filled.Refresh else Icons.Filled.PlayArrow,
+            contentDescription = if (isPlaying) "Pause" else "Play",
+            tint = Color.White,
+            modifier = Modifier.size(48.dp)
+        )
     }
 }
 
- */
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable

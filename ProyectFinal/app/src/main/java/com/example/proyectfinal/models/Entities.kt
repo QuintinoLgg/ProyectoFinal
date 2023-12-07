@@ -12,7 +12,7 @@ data class Task(
     @ColumnInfo(name = Constants.TasksTable.TITLE) val titulo: String,
     @ColumnInfo(name = Constants.TasksTable.DESC) val descripcion: String,
     @ColumnInfo(name = Constants.TasksTable.DATE) val fecha: String,
-    @ColumnInfo(name = Constants.TasksTable.IMAGE) val imageUri: String
+    @ColumnInfo(name = Constants.TasksTable.IMAGE) val images: String? = null
 )
 
 @Entity(tableName = Constants.NotesTable.NAME)

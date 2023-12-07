@@ -58,6 +58,7 @@ import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.LaunchedEffect
@@ -172,46 +173,52 @@ private fun Content(viewModel: miViewModel, navController: NavController, naviga
 @Composable
 private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController: NavController){
     val scope = rememberCoroutineScope()
-
-    val currentTitulo = remember { mutableStateOf("") }
-    val currentDescripcion = remember { mutableStateOf("") }
-    var currentImages by remember { mutableStateOf(listOf<String>()) }
+    val currentTitulo = remember { mutableStateOf("") }         // Variable que guarda el titulo
+    val currentDescripcion = remember { mutableStateOf("") }    // Variable que guarda la descripcion
+    var images by remember { mutableStateOf(listOf<String>()) }       // Variable que guarda las Uri's de las imagenes y videos
     val note = Constants.General.nota
     val context = LocalContext.current
-
-    // MULTIMEDIA NUEVA ------------------------------------------------
-    var uriCamara : Uri? = null
-
-    val recorder by lazy {
-        AndroidAudioRecorder(context)
-    }
+    var uriCamara : Uri? = null         // Variable que guarda la Uri de la foto que se tome con la camara
 
     val player by lazy {
         AndroidAudioPlayer(context)
     }
 
+    // Variable de audio
+    var i by remember {
+        mutableStateOf(0)
+    }
+
+    // Variable que guarda los archivos de audio
+    var audioFiles by remember(i) {
+        mutableStateOf(List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) })
+    }
+
+    // Variable usada para tomar imagen de la galeria o documentos
     val getImageRequest = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ){uri ->
         if(uri != null) {
-            currentImages = currentImages.plus(uri!!.toString() + "|JPG")
+            images = images.plus(uri!!.toString() + "|IMG")
         }
     }
 
+    // Variable usada para tomar una fotografia con la camara nativa del telefono
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
         onResult = { success ->
             if(success){
-                currentImages = currentImages.plus(uriCamara!!.toString()+"|JPG")
+                images = images.plus(uriCamara!!.toString()+"|IMG")
             }
         }
     )
 
+    // Variable usada para poder lanzar la grabadora de video
     val videoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CaptureVideo(),
         onResult = { success ->
             if(success){
-                currentImages = currentImages.plus(uriCamara!!.toString()+"|MP4")
+                images = images.plus(uriCamara!!.toString()+"|VID")
             }
         }
     )
@@ -222,29 +229,20 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
             currentTitulo.value = note.titulo
             currentDescripcion.value = note.descripcion
             if(note.images!!.isNotBlank()){
+                // Conversion de las uris
                 val urisFromString = note.images!!.split(", ").map { it }
-                currentImages = urisFromString
+                images = urisFromString
             }
         }
     }
 
 
-    //VARIABLES DE AUDIO
-    var i by remember {
-        mutableStateOf(0)
-    }
-
-    var audioFiles by remember(i) {
-        mutableStateOf(List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) })
-    }
-    // MULTIMEDIA NUEVA ------------------------------------------------
 
     Column(
         modifier = Modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        //item{
-        // CAJA DE TEXTO DE TITULO
+        // Campo de texto para el titulo
         TextField(
             value = currentTitulo.value,
             onValueChange = { value ->
@@ -255,25 +253,8 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
-        //}
 
-        /*
-        item {
-            // COMBOBOX PARA ESCOGER NOTA O TAREA
-            val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
-            ComboBox(options, stringResource(id = R.string.asunto), miViewModel)
-            Spacer(modifier = Modifier.height(16.dp))
-        }*/
-
-        /*
-        item {
-            // DATETIMEPICKER PARA SELECCIONAR LA FECHA DE LA NOTA
-            DatePicker(miViewModel)
-            Spacer(modifier = Modifier.height(16.dp))
-        }*/
-
-        //item {
-        // CAJA DE TEXTO PARA LA DESCRIPCI[ON
+        // Campo de texto para la descripcion
         TextField(
             value = currentDescripcion.value,
             onValueChange = { value ->
@@ -284,48 +265,46 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(30.dp))
-        //}
 
-
-
-        //item {
-        // Multimedia(currentFoto, currentVideo)
+        // Botones de multimedia
         Row {
-            // IMAGEN DE GALERIA
-            IconButton(
+            // Tomar imagen de galeria
+            TextButton(
                 onClick = {
                     getImageRequest.launch(arrayOf("image/*"))
                 }
             ) {
-                Icon(Icons.Filled.Filter, contentDescription = null)
+                Icon(Icons.Default.Filter, contentDescription = null)
+                Text("Galeria")
             }
-            // CAMARA
-            IconButton(
+            // Tomar imagen con la camara
+            TextButton(
                 onClick = {
                     uriCamara = ComposeFileProvider.getImageUri(context)
                     cameraLauncher.launch(uriCamara)
                 }
             ) {
-                Icon(Icons.Filled.CameraAlt, contentDescription = null)
+                Icon(Icons.Default.CameraAlt, contentDescription = null)
+                Text("Camara")
             }
-            // VIDEO
-            IconButton(
+            // Tomar video
+            TextButton(
                 onClick = {
                     val uri = ComposeFileProvider.getImageUri(context)
                     videoLauncher.launch(uri)
                     uriCamara = uri
                 }
             ) {
-                Icon(Icons.Filled.Videocam, contentDescription = null)
+                Icon(Icons.Default.Videocam, contentDescription = null)
+                Text("Video")
             }
 
         }
-        //}
 
 
+        // Boton de guardar y cancelar
         Row {
-            //val options = listOf(stringResource(id = R.string.nota), stringResource(id = R.string.tarea))
-            // BOTON DE GUARDAR
+            // Boton de guardar
             Button(
                 onClick = {
                     viewModel.updateNote(
@@ -333,7 +312,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                             id = 0,
                             titulo = currentTitulo.value,
                             descripcion = currentDescripcion.value,
-                            images = currentImages.joinToString()
+                            images = images.joinToString()
                         )
                     )
                     navController.popBackStack()
@@ -352,11 +331,10 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                 Text(stringResource(id = R.string.guardar))
             }
             Spacer(modifier = Modifier.width(10.dp))
-            // BOTON DE CANCELAR
+            // Boton de cancelar
             Button(
                 onClick = {
                     audioFiles.forEach { it.audioFile.delete() }
-
                     // Reiniciar todos los datos al presionar el botón
                     i = 0
                     audioFiles = List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) }
@@ -374,16 +352,17 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(stringResource(id = R.string.cancelar))
             }
-            // }
         }
 
+
+        // Lazy column para mostrar el contenido multimedia
         LazyColumn {
-            itemsIndexed(currentImages){index, uri ->
+            itemsIndexed(images){index, uri ->
                 ObjetoMultimedia(uri = uri, player = player)
             }
 
             item {
-                // AUDIO
+                // Audio
                 val context = LocalContext.current
                 val recorder by lazy {
                     AndroidAudioRecorder(context)
@@ -393,8 +372,7 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                     AndroidAudioPlayer(context)
                 }
 
-
-
+                // Mostrar los audios y sus botones
                 Column {
                     audioFiles.forEachIndexed { index, audioModel ->
                         GrabarAudioScreen(
@@ -402,47 +380,40 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                                 val updatedAudioFiles = audioFiles.toMutableList()
                                 updatedAudioFiles[index] = audioModel.copy(isRecording = true)
                                 audioFiles = updatedAudioFiles
-
                                 recorder.start(audioModel.audioFile)
                             },
                             onClickSpGra = {
                                 val updatedAudioFiles = audioFiles.toMutableList()
                                 updatedAudioFiles[index] = audioModel.copy(isRecording = false)
                                 audioFiles = updatedAudioFiles
-
                                 recorder.stop()
                             },
                             onClickStRe = {
                                 val updatedAudioFiles = audioFiles.toMutableList()
                                 updatedAudioFiles[index] = audioModel.copy(isPlaying = true)
                                 audioFiles = updatedAudioFiles
-
                                 player.start(audioModel.audioFile)
                             },
                             onClickSpRe = {
                                 val updatedAudioFiles = audioFiles.toMutableList()
                                 updatedAudioFiles[index] = audioModel.copy(isPlaying = false)
                                 audioFiles = updatedAudioFiles
-
                                 player.stop()
                             }
                         )
                     }
-
-                    Button(onClick = { ++i }) {
-                        Icon(
-                            Icons.Filled.AddCircle,
-                            contentDescription = "Más",
-                            modifier = Modifier.size(25.dp)
-                        )
+                    // Agregar nota de voz
+                    TextButton(
+                        onClick = {
+                            ++i
+                        }
+                    ) {
+                        Icon(Icons.Default.Mic, contentDescription = null)
+                        Text("Audio")
                     }
                 }
             }
         }
-        //item {
-        // BOTÓN GUARDAR Y CANCELAR
-
-
     }
 }
 
@@ -456,6 +427,8 @@ fun EditNoteScreen(viewModel: miViewModel, navController: NavController, navigat
     }
 }
 
+
+// Composable de multimedia que ya no utilizamos
 @Composable
 fun Multimedia(
     rutaImagen: MutableState<String>,
@@ -584,47 +557,5 @@ fun Multimedia(
     Spacer(modifier = Modifier.height(16.dp))
 }
 
-@Composable
-fun VideoPlayer(videoUri: Uri, modifier: Modifier = Modifier.fillMaxWidth()) {
-    val context = LocalContext.current
-    val exoPlayer = remember {
-        SimpleExoPlayer.Builder(context).build().apply {
-            setMediaItem(MediaItem.fromUri(videoUri))
-            prepare()
-        }
-    }
-    val playbackState = exoPlayer
-    val isPlaying = playbackState?.isPlaying ?: false
 
-    AndroidView(
-        factory = { context ->
-            PlayerView(context).apply {
-                player = exoPlayer
-            }
-        },
-        modifier = Modifier
-            .fillMaxWidth(0.8f)
-            .height(200.dp),
-    )
-
-    IconButton(
-        onClick = {
-            if (isPlaying) {
-                exoPlayer.pause()
-            } else {
-                exoPlayer.play()
-            }
-        },
-        modifier = Modifier
-            //.align(Alignment.BottomEnd)
-            .padding(16.dp)
-    ) {
-        Icon(
-            imageVector = if (isPlaying) Icons.Filled.Refresh else Icons.Filled.PlayArrow,
-            contentDescription = if (isPlaying) "Pause" else "Play",
-            tint = Color.White,
-            modifier = Modifier.size(48.dp)
-        )
-    }
-}
 
