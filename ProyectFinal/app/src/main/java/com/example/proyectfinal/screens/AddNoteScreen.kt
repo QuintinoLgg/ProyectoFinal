@@ -71,12 +71,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Filter
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
+import com.example.proyectfinal.data.AudioModel
 import com.example.proyectfinal.ui.theme.AndroidAudioPlayer
 import com.example.proyectfinal.ui.theme.AndroidAudioRecorder
 import com.example.proyectfinal.ui.theme.ComposeFileProvider
@@ -203,6 +205,15 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
     )
 
 
+    //VARIABLES DE AUDIO
+    var i by remember {
+        mutableStateOf(0)
+    }
+
+
+    var audioFiles by remember(i) {
+        mutableStateOf(List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) })
+    }
     // MULTIMEDIA NUEVA ------------------------------------------------
 
     Column(
@@ -287,7 +298,68 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
             }
         //}
 
+        LazyColumn {
+            itemsIndexed(images){index, uri ->
+                ObjetoMultimedia(uri = uri, player = player)
+            }
 
+            item {
+                // AUDIO
+                val context = LocalContext.current
+                val recorder by lazy {
+                    AndroidAudioRecorder(context)
+                }
+
+                val player by lazy {
+                    AndroidAudioPlayer(context)
+                }
+
+
+
+                Column {
+                    audioFiles.forEachIndexed { index, audioModel ->
+                        GrabarAudioScreen(
+                            onClickStGra = {
+                                val updatedAudioFiles = audioFiles.toMutableList()
+                                updatedAudioFiles[index] = audioModel.copy(isRecording = true)
+                                audioFiles = updatedAudioFiles
+
+                                recorder.start(audioModel.audioFile)
+                            },
+                            onClickSpGra = {
+                                val updatedAudioFiles = audioFiles.toMutableList()
+                                updatedAudioFiles[index] = audioModel.copy(isRecording = false)
+                                audioFiles = updatedAudioFiles
+
+                                recorder.stop()
+                            },
+                            onClickStRe = {
+                                val updatedAudioFiles = audioFiles.toMutableList()
+                                updatedAudioFiles[index] = audioModel.copy(isPlaying = true)
+                                audioFiles = updatedAudioFiles
+
+                                player.start(audioModel.audioFile)
+                            },
+                            onClickSpRe = {
+                                val updatedAudioFiles = audioFiles.toMutableList()
+                                updatedAudioFiles[index] = audioModel.copy(isPlaying = false)
+                                audioFiles = updatedAudioFiles
+
+                                player.stop()
+                            }
+                        )
+                    }
+
+                    Button(onClick = { ++i }) {
+                        Icon(
+                            Icons.Filled.AddCircle,
+                            contentDescription = "Más",
+                            modifier = Modifier.size(25.dp)
+                        )
+                    }
+                }
+            }
+        }
         //item {
             // BOTÓN GUARDAR Y CANCELAR
             Row {
@@ -322,7 +394,13 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                 Spacer(modifier = Modifier.width(10.dp))
                 // BOTON DE CANCELAR
                 Button(
-                    onClick = { navController.popBackStack() },
+                    onClick = {
+                        audioFiles.forEach { it.audioFile.delete() }
+
+                        // Reiniciar todos los datos al presionar el botón
+                        i = 0
+                        audioFiles = List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) }
+                        navController.popBackStack() },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error,
                         contentColor = MaterialTheme.colorScheme.onPrimary
@@ -339,14 +417,6 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
            // }
         }
 
-
-        //item {
-            LazyColumn {
-                itemsIndexed(images){index, uri ->
-                    ObjetoMultimedia(uri = uri, player = player)
-                }
-            }
-        //}
     }
 
 }

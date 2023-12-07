@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
@@ -69,6 +70,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import com.example.proyectfinal.Constants
+import com.example.proyectfinal.data.AudioModel
 import com.example.proyectfinal.ui.theme.MainViewModel
 import com.example.proyectfinal.data.bottomNavItems
 import com.example.proyectfinal.models.Note
@@ -173,6 +175,15 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
     val currentFoto = remember { mutableStateOf("") }
     val currentVideo = remember { mutableStateOf("") }
     val note = Constants.General.nota
+    val context = LocalContext.current
+
+    //VARIABLES DE AUDIO
+    var i by remember {
+        mutableStateOf(0)
+    }
+    var audioFiles by remember(i) {
+        mutableStateOf(List(i) { index -> AudioModel(File(context.cacheDir, "audio_$index.mp3")) })
+    }
 
     LaunchedEffect(true){
         scope.launch(Dispatchers.IO){
@@ -229,19 +240,50 @@ private fun UI(viewModel: miViewModel, miViewModel: MainViewModel, navController
                 AndroidAudioPlayer(context)
             }
 
-            var audioFile: File? = null
 
-            GrabarAudioScreen(
-                onClickStGra = {
-                    File(context.cacheDir, "audio.mp3").also {
-                        recorder.start(it)
-                        audioFile = it
-                    }
-                },
-                onClickSpGra = { recorder.stop() },
-                onClickStRe = { audioFile?.let { player.start(it) } },
-                onClickSpRe = { player.stop() }
-            )
+
+            Column {
+                audioFiles.forEachIndexed { index, audioModel ->
+                    GrabarAudioScreen(
+                        onClickStGra = {
+                            val updatedAudioFiles = audioFiles.toMutableList()
+                            updatedAudioFiles[index] = audioModel.copy(isRecording = true)
+                            audioFiles = updatedAudioFiles
+
+                            recorder.start(audioModel.audioFile)
+                        },
+                        onClickSpGra = {
+                            val updatedAudioFiles = audioFiles.toMutableList()
+                            updatedAudioFiles[index] = audioModel.copy(isRecording = false)
+                            audioFiles = updatedAudioFiles
+
+                            recorder.stop()
+                        },
+                        onClickStRe = {
+                            val updatedAudioFiles = audioFiles.toMutableList()
+                            updatedAudioFiles[index] = audioModel.copy(isPlaying = true)
+                            audioFiles = updatedAudioFiles
+
+                            player.start(audioModel.audioFile)
+                        },
+                        onClickSpRe = {
+                            val updatedAudioFiles = audioFiles.toMutableList()
+                            updatedAudioFiles[index] = audioModel.copy(isPlaying = false)
+                            audioFiles = updatedAudioFiles
+
+                            player.stop()
+                        }
+                    )
+                }
+
+                Button(onClick = { ++i }) {
+                    Icon(
+                        Icons.Filled.AddCircle,
+                        contentDescription = "Más",
+                        modifier = Modifier.size(25.dp)
+                    )
+                }
+            }
         }
 
         item{
